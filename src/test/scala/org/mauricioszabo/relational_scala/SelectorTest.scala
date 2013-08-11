@@ -1,26 +1,40 @@
-import org.scalatest.FlatSpec
+import org.scalatest._
 import org.scalatest.matchers.ShouldMatchers
 
 import org.mauricioszabo.relational_scala._
-import java.sql.DriverManager
 
-class SelectorTest extends FlatSpec with ShouldMatchers {
-  val people = new tables.Table("people")
-  val selector = new Selector
+class SelectorTest extends FlatSpec with DatabaseSetup with ShouldMatchers {
+  val people = new tables.Table("scala_people")
 
-  Class.forName("org.sqlite.JDBC");
-  val connection = DriverManager.getConnection("jdbc:sqlite::memory:")
+  //import scala.reflect.runtime.universe._
+  //def foo[A](a: A)(implicit tag: TypeTag[A]) = tag.tpe
+  //typeOf[Something].members.filter(m => m.isTerm && (m.asTerm.isVal || m.asTerm.isVar))
 
-  //Creation of databases
-  connection.prepareStatement("""CREATE TABLE people
-    (id INTEGER PRIMARY KEY, name VARCHAR(255), age INTEGER)""").executeUpdate
+  "Selector" should "create an SQL" in {
+    var selector = Selector(from=List(people), select=List(people.*))
+    selector.partial.toPseudoSQL should be === "SELECT scala_people.* FROM scala_people"
 
-  connection.prepareStatement("INSERT INTO people VALUES(1, 'Foo', 17)").executeUpdate
-  connection.prepareStatement("INSERT INTO people VALUES(2, 'Foo', 18)").executeUpdate
-  connection.prepareStatement("INSERT INTO people VALUES(3, 'bar', 17)").executeUpdate
+    selector = Selector(from=List(people), select=List(people.*), where=(people("id") == 10))
+    selector.partial.toPseudoSQL should be === "SELECT scala_people.* FROM scala_people WHERE scala_people.id = 10"
+  }
 
-  "Selector" should "search for records in a database" in {
-    val results = selector from (people)
-    results.size should be === 3
+  it should "search for records in a database" in {
+    val selector = Selector(from=List(people), select=List(people.*), where=(people("id") <= 2), connection=connection)
+    val ids = selector.results.map(_ attribute 'id asInt)
+    ids.toList should be === List(1, 2)
+  }
+
+  it should "search with a string" in {
+    val selector = Selector(from=List(people), select=List(people.*), where=(people("name") == "Foo"), connection=connection)
+    val ids = selector.results.map(_ attribute 'id asInt)
+    ids.toList should be === List(1, 2)
+  }
+
+  it should "search with a date" in {
+    pending
+    val selector = Selector(from=List(people), select=List(people.*),
+      where=(people("birth") < java.sql.Date.valueOf("1990-01-01")), connection=connection)
+    val ids = selector.results.map(_ attribute 'id asInt)
+    ids.toList should be === List(1, 3)
   }
 }

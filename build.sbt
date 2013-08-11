@@ -1,7 +1,10 @@
-scalaVersion := "2.9.2"
+scalaVersion := "2.10.2"
+
+scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
 libraryDependencies ++= Seq(
-  "org.scalatest" %% "scalatest" % "1.8" % "test",
+  "org.scalatest" %% "scalatest" % "1.9" % "test",
   "net.snaq" % "dbpool" % "5.1",
-  "org.xerial" % "sqlite-jdbc" % "3.7.2"// % "test"
+  "postgresql" % "postgresql" % "9.1-901.jdbc4" //,
+  //"org.xerial" % "sqlite-jdbc" % "3.7.2"// % "test"
 )

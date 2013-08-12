@@ -1,11 +1,16 @@
 package org.mauricioszabo.relational_scala.attributes
 
 import org.mauricioszabo.relational_scala.comparissions._
+import org.mauricioszabo.relational_scala._
 
-trait Attribute {
+trait Attribute extends Select with Partial {
   def representation: String
+  def partial = new PartialStatement(representation, Nil)
 
   def ==(other: => Any ) = new Equality("=", this, other)
+  def ->(other: => Any ) = this == other
+  def ===(other: => Any ) = this == other
+
   def !=(other: => Any ) = new Equality("<>", this, other)
   def <=(other: Any) = new Equality("<=", this, other)
   def <(other: Any) = new Equality("<", this, other)
@@ -29,4 +34,6 @@ trait Attribute {
   def lower = new Function("LOWER", this)
   def length = new Function("LENGTH", this)
   def count = new Function("COUNT", this)
+
+  override def toString = getClass.getName + "("+representation+")"
 }

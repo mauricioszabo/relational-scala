@@ -3,18 +3,19 @@ package org.mauricioszabo.relational_scala.comparissions
 import org.mauricioszabo.relational_scala.attributes._
 import org.mauricioszabo.relational_scala.PartialStatement
 
-class Equality(comparission: String, attribute: Attribute, other: Any) extends Comparission {
+class Equality(comparission: String, attribute: AttributeLike, other: Any) extends Comparission {
   lazy val partial = other match {
-    case a: Attribute => new PartialStatement(query + a.representation, Nil)
+    case a: AttributeLike => new PartialStatement(query + a.partial.query, ap.attributes ++ a.partial.attributes)
     case null => handleNull
-    case _ => new PartialStatement(query + "?", List(other))
+    case _ => new PartialStatement(query + "?", List(other) ++ ap.attributes)
   }
-
-  private lazy val query = attribute.representation + " " + comparission + " "
 
   private def handleNull = comparission match {
-    case "=" => new PartialStatement(attribute.representation + " IS NULL", Nil)
-    case "<>" => new PartialStatement(attribute.representation + " IS NOT NULL", Nil)
-    case _ => new PartialStatement(attribute.representation + " " + comparission + " NULL", Nil)
+    case "=" => new PartialStatement(ap.query + " IS NULL", ap.attributes)
+    case "<>" => new PartialStatement(ap.query + " IS NOT NULL", ap.attributes)
+    case _ => new PartialStatement(ap.query + " " + comparission + " NULL", ap.attributes)
   }
+
+  private lazy val query = ap.query + " " + comparission + " "
+  private lazy val ap = attribute.partial
 }

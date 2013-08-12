@@ -4,21 +4,21 @@ import org.mauricioszabo.relational_scala._
 import org.mauricioszabo.relational_scala.results._
 
 case class Selector(
-    select: Seq[attributes.Attribute],
+    select: Seq[attributes.AttributeLike],
     from: Seq[tables.TableLike],
     where: comparissions.Comparission = null,
-    group: Seq[attributes.Attribute] = Nil,
+    group: Seq[attributes.AttributeLike] = Nil,
     having: comparissions.Comparission = null,
     join: Seq[_] = Nil,
     order: Seq[Partial] = Nil,
     connection: java.sql.Connection = null
-  ) extends attributes.Select {
+  ) {
 
   def copy(
-    select: Seq[attributes.Attribute] = select,
+    select: Seq[attributes.AttributeLike] = select,
     from: Seq[tables.TableLike] = from,
     where: comparissions.Comparission = where,
-    group: Seq[attributes.Attribute] = group,
+    group: Seq[attributes.AttributeLike] = group,
     having: comparissions.Comparission = having,
     join: Seq[_] = join,
     order: Seq[Partial] = order,

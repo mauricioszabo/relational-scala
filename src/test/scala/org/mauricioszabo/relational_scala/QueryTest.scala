@@ -28,6 +28,41 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
       val two = People query { p => p where (p('id) > 1 && p('id) < 3) select (p('id), p('name)) }
       results(two) should be === List((2, "Foo"))
     }
+
+    "finds distinct records" in {
+      pending
+      //val people = new tables.Table("scala_people").as("sp")
+      //val two = People distinct ('id, 'name) from ('scala_people, people)
+      //results(two) should be === List((2, "Foo"))
+    }
+
+    "join another table" in {
+      val address = People join 'scala_addresses on { (p, a) => p('id) == a('person_id) }
+      results(address) should be === List((1, "Foo"), (1, "Foo"), (2, "Foo"))
+    }
+
+    "left join another table" in {
+      val address = People leftJoin 'scala_addresses on { (p, a) => p('id) == a('person_id) }
+      results(address) should be === List((1, "Foo"), (1, "Foo"), (2, "Foo"), (3, "Bar"))
+    }
+
+    "counts records on table" in {
+      val names = People query { implicit p => p select ('name.count.as("count"), 'name) group 'name }
+
+      val results = names.copy(connection=connection).results.map { e =>
+        (e attribute 'count as Int, e get 'name)
+      }
+      results should be === List( (2, "Foo"), (1, "Bar") )
+    }
+
+    "order the query" in {
+      val names = People query { implicit p => p order 'id.desc }
+      results(names) should be === List( (3, "Bar"), (2, "Foo"), (1, "Foo") )
+    }
+
+    "order the query with a subselect" in {
+      pending
+    }
   }
 
   "Query using implicit conversions" should {

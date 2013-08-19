@@ -3,7 +3,7 @@ package org.mauricioszabo.relational_scala.comparissions
 import org.mauricioszabo.relational_scala._
 import org.mauricioszabo.relational_scala.comparissions._
 
-trait Comparission extends attributes.AttributeLike {
+trait Comparission extends attributes.Comparable {
   def unary_! = new Not(this)
 
   def ||(other: Comparission): Comparission = new Or(List(this, other))

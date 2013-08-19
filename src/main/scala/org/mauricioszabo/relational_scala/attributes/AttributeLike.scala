@@ -1,36 +1,11 @@
 package org.mauricioszabo.relational_scala.attributes
 
 import org.mauricioszabo.relational_scala._
-import org.mauricioszabo.relational_scala.comparissions._
 
 trait AttributeLike extends Partial {
-  def ==(other: => Any ) = new Equality("=", this, other)
-  def ===(other: => Any ) = this == other
-  def ->(other: => Any ) = this == other
+  def as: Alias = as(Random.generate(5))
+  def as(name: String): Alias = new Alias(name, partial.query, partial.attributes)
 
-  def !=(other: => Any ) = new Equality("<>", this, other)
-  def <=(other: Any) = new Equality("<=", this, other)
-  def <(other: Any) = new Equality("<", this, other)
-  def >=(other: Any) = new Equality(">=", this, other)
-  def >(other: Any) = new Equality(">", this, other)
-
-  def isNull = this == null
-
-  def =~(other: Any) = like(other)
-  def like(other: Any) = new Equality("LIKE", this, other)
-  def !~(other: Any) = notLike(other)
-  def notLike(other: Any) = new Equality("NOT LIKE", this, other)
-
-  def in(list: Seq[Any]) = new In(this, list)
-
-  def sum = new Function("SUM", this)
-  def avg = new Function("AVG", this)
-  def min = new Function("MIN", this)
-  def max = new Function("MAX", this)
-  def upper = new Function("UPPER", this)
-  def lower = new Function("LOWER", this)
-  def length = new Function("LENGTH", this)
-  def count = new Function("COUNT", this)
-
+  def selectPartial = partial
   override def toString = getClass.getName + "(" + partial.query + ")"
 }

@@ -8,6 +8,8 @@ class AttributeTest extends WordSpec with ShouldMatchers {
   lazy val name = new attributes.Attribute(table, "name")
   lazy val id = table('id)
 
+  //TODO: add a case for SELECT DISTINCT, and COUNT(DISTINCT attr)
+
   "Attribute" should {
     "have a representation" in {
       attributeSql(name) should be === "examples.name"

@@ -1,4 +1,4 @@
-Relational Scala
+    Relational Scala
 ================
 
 An API to query databases.
@@ -58,3 +58,30 @@ People.query { implicit p =>
   having ('name.count > 1)
 }
 ```
+
+## Joins
+It is possible to make joins (even the most complex ones) using a simple syntax: there are the methods `leftJoin`, `rightJoin`, and `join` (inner join). Each of these perform a simple join and return a "JoinHelper" object, where you call the `on` method and return the join condition.
+
+```scala
+People join 'addresses on { (p, a) => p('id) == a('person_id) }
+//Constructs a query: SELECT * FROM people INNER JOIN addresses ON people.id = addresses.person_id
+```
+
+## Results
+By default, each command prepares the query but never really tries to find anything on database. So, you should call "results" to fetch the results of the query. These will give you a List of Attributes, so you can convert these to any format you desire:
+
+```scala
+val people = People query { implicit p =>
+  p select ('name, 'name.count.as("number")) group 'number
+}
+
+people.foreach { p =>
+  val name = p get 'name
+  val count = p attribute 'number as Int
+  println("There are " + count + " names '" + name "' on database")
+}
+```
+
+Note that "count" is an `Int`, because of `as Int` part of the code.
+
+Relational Scala doesn't tries to be "type-safe": indeed, SQL itself is not "static typed": you can, for instance, cast "name" to an INTEGER on SQL, and there is no way to catch this on Scala (or any other language).

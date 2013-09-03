@@ -18,6 +18,10 @@ class AttributeTest extends WordSpec with ShouldMatchers {
     "represent every attribute on a table" in {
       attributeSql(table.*) should be === "examples.*"
     }
+
+    "represent a single attribute dynamically" in {
+      attributeSql(table.name) should be === "examples.name"
+    }
   }
 
   "Attributes comparission" should {

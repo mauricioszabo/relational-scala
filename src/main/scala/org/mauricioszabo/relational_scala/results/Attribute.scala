@@ -1,7 +1,7 @@
 package org.mauricioszabo.relational_scala.results
 import scala.language.implicitConversions
 
-class Attribute(protected val obj: Any) {
+class Attribute(val obj: Any) {
   def value = obj.toString
 
   def isNull = obj == null

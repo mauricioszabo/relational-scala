@@ -2,17 +2,23 @@ package org.mauricioszabo.relational_scala.orm
 
 import scala.language.implicitConversions
 import org.mauricioszabo.relational_scala.results.{Attribute => Attr}
+import scala.reflect.ClassTag
+import scala.language.higherKinds
 
-class Attribute(protected val maybeAttr: Option[Attr])
+class Attribute(maybeAttr: => Option[Attr]) {
+  def as[A[B] <: Property[B], B](implicit ct: ClassTag[A[B]], ev: Attr => B) = {
+    val newProperty = ct.runtimeClass.newInstance.asInstanceOf[A[B]]
+    newProperty.possibleValue = { () => getValue[B] }
+    newProperty
+  }
 
-object Attribute {
-  implicit def attr2property[A](attribute: Attribute)(implicit ev: Attr => A): Property[A] = try {
-    attribute.maybeAttr match {
-      case Some(value) if(value.isNull) => new Property(None)
-      case Some(value) => new Property(Some(ev(value)))
-      case None => new Property(None)
-    }
+  private def getValue[A](implicit ev: Attr => A): Option[A] = try {
+    maybeAttr match {
+      case Some(value) if(value.isNull) => None
+      case Some(value) => Some(ev(value))
+      case None => None
+      }
   } catch {
-    case _: NumberFormatException => new Property(None)
+    case _: NumberFormatException => None
   }
 }

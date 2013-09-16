@@ -6,7 +6,7 @@ import scala.language.implicitConversions
 trait Query {
   private var relationalTable: tables.TableLike = {
     val regex = """.*\$([^\$]+)\$.*""".r
-    val name = regex.replaceFirstIn(getClass.getName, "$1")
+    val name = regex.replaceFirstIn(getClass.getName, "$1").toLowerCase
     new tables.Table(name)
   }
 

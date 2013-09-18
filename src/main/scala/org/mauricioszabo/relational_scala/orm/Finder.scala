@@ -6,15 +6,6 @@ import scala.reflect.runtime.universe._
 import java.lang.reflect.Field
 
 class Finder[A <: Mapping](implicit val tag: ClassTag[A]) extends Query with Traversable[A] {
-  //private var relationalTable: tables.TableLike = {
-  //  val regex = """.*\$([^\$]+)\$.*""".r
-  //  val name = regex.replaceFirstIn(getClass.getName, "$1").toLowerCase
-  //  new tables.Table(name)
-  //}
-
-  //def table = relationalTable
-  //protected def table_=(tableName: String) { relationalTable = new tables.Table(tableName) }
-
   protected var pk = 'id
   protected var getConnection = config.Connection.getConnection
 
@@ -37,7 +28,7 @@ class Finder[A <: Mapping](implicit val tag: ClassTag[A]) extends Query with Tra
     all.copy(connection=connection).results.foreach { attributes =>
       val instance = klass.newInstance
       val map = attributes.attribute.map { case(k, v) => (k, v.obj) }
-      mappings.set(instance, map.toSeq)
+      mappings.set(instance, map)
       fn(instance.asInstanceOf[A])
     }
   }

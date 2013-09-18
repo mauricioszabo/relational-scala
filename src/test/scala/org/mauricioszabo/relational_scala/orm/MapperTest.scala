@@ -10,13 +10,13 @@ class Person extends Mapping {
 }
 
 class FinderTest extends WordSpec with matchers.ShouldMatchers with tests.DatabaseSetup {
-  object People extends Finder[Person] {
+  object People extends Mapper[Person] {
     pk = 'id
     table = "scala_people"
     getConnection = { () => connection }
   }
 
-  "Finder" should {
+  "Mapper" should {
     "find all records" in {
       val names = People.map { p => p.name.value }
       names.toList should be === List("Foo", "Foo", "Bar")

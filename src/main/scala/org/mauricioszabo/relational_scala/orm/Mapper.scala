@@ -5,7 +5,7 @@ import scala.reflect.ClassTag
 import scala.reflect.runtime.universe._
 import java.lang.reflect.Field
 
-class Finder[A <: Mapping](implicit val tag: ClassTag[A]) extends Query with Traversable[A] {
+class Mapper[A <: Mapping](implicit val tag: ClassTag[A]) extends Query with Traversable[A] {
   protected var pk = 'id
   protected var getConnection = config.Connection.getConnection
 

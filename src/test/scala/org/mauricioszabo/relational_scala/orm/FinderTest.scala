@@ -6,7 +6,7 @@ import org.mauricioszabo.relational_scala.orm._
 
 class Person extends Mapping {
   val name = attr.name.as[Property, String]
-  val mappings: Seq[(Symbol, Any)] = Seq( ('a -> 10) )
+  val mappings: Map[Symbol, Any] = Map('a -> 10)
 }
 
 class FinderTest extends WordSpec with matchers.ShouldMatchers with tests.DatabaseSetup {

@@ -10,9 +10,9 @@ class DynamicAttr(a: => Attributes) extends Dynamic {
 }
 
 trait Mapping {
-  protected val mappings: Seq[(Symbol, Any)]
+  protected val mappings: Map[Symbol, Any]
 
-  lazy val attributes = new Attributes(
+  def attributes = new Attributes(
     mappings.map { case(key, value) => (key, RAttribute(value)) }
   )
 

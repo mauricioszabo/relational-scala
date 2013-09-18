@@ -7,7 +7,7 @@ import org.mauricioszabo.relational_scala.orm._
 
 class MappingTest extends WordSpec with tests.DatabaseSetup with ShouldMatchers {
   class Person(p: (Symbol, Any) *) extends Mapping {
-    val mappings = p
+    val mappings = Map(p: _*)
 
     val name = attr('name).as[Property, String]
     val email = attr.email.as[Formatted, String].withFormat("(.*)@(.*)".r)

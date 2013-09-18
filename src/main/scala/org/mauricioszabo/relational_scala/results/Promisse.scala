@@ -7,6 +7,6 @@ class Promisse(resultSet: java.sql.ResultSet) extends Traversable[Attributes] {
       val obj = resultSet.getObject(i).asInstanceOf[Any]
       Symbol(meta.getColumnName(i)) -> Attribute(obj)
     }
-    fn(new Attributes(columns))
+    fn(new Attributes(Map(columns: _*)))
   }
 }

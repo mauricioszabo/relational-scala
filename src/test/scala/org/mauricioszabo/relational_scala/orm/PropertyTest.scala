@@ -7,7 +7,7 @@ import org.mauricioszabo.relational_scala.orm._
 
 class PropertyTest extends WordSpec with tests.DatabaseSetup with ShouldMatchers {
   class Person(p: (Symbol, Any) *) extends Mapping {
-    val mappings = p
+    val mappings = Map(p: _*)
     val name = attr('name).as[Property, String]
     val age = attr('age).as[Property, Int]
     val email = attr('email).as[Formatted, String].withFormat("(.*)@(.*)".r)
@@ -61,6 +61,19 @@ class PropertyTest extends WordSpec with tests.DatabaseSetup with ShouldMatchers
     "validates with a function" in {
       val p = new Person('function -> "INVALID")
       p.function should not be('valid)
+    }
+  }
+
+  "Property refresh" should {
+    "not be cached" in {
+      val p = new Person('name -> "Foo")
+      p.name.value should be === "Foo"
+
+      val f = p.getClass.getDeclaredField("mappings")
+      f.setAccessible(true)
+      f.set(p, Map('name -> "Bar"))
+      p.name.value should be === "Bar"
+
     }
   }
 }

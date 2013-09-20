@@ -1,17 +1,24 @@
-    Relational Scala
+Relational Scala
 ================
 
 An API to query databases.
 
 ## Motivation
-ORMs are quite interesting pieces of software: they can generate SQL in such a way that it is secure and simple. But the simple truth is that they do not solve every problem, and in most ways we need to generate SQL by hand.
+ORMs are quite interesting pieces of software: they can generate SQL in such a
+way that it is secure and simple. But the simple truth is that they do not
+solve every problem, and in most ways we need to generate SQL by hand.
 
 The problem is the "gap"
 
-When we generate SQL by hand, we lost most of the advantages that ORMs give us. On the other hand, when we use the ORM, things "just work" but we lost all the fine-tuning queries we can use.
+When we generate SQL by hand, we lost most of the advantages that ORMs give us.
+On the other hand, when we use the ORM, things "just work" but we lost all the
+fine-tuning queries we can use.
 
 ## Enter Relational Scala
-Using the power of Scala and flexibility of SQL, we can create a fine-tunned query without losing power on the SQL way. Some tradeoffs need to be taken-we never write SQL in string way, but we can do quite close using Scala's operator overloading.
+Using the power of Scala and flexibility of SQL, we can create a fine-tunned
+query without losing power on the SQL way. Some tradeoffs need to be taken-we
+never write SQL in string way, but we can do quite close using Scala's operator
+overloading.
 
 ##Simple Queries
 
@@ -26,7 +33,8 @@ People.where { p => p('id) < 10 || p('id) > 20 }
 
 ```
 
-We can construct our queries using `select`, `group`, `having`, `where`, `order`, `leftJoin`, `innerJoin` (or just `join`), `rightJoin`, `from`, etc.
+We can construct our queries using `select`, `group`, `having`, `where`,
+`order`, `leftJoin`, `innerJoin` (or just `join`), `rightJoin`, `from`, etc.
 
 ```scala
 //Finds all people that has someone with the same name in this table
@@ -60,7 +68,10 @@ People.query { implicit p =>
 ```
 
 ## Joins
-It is possible to make joins (even the most complex ones) using a simple syntax: there are the methods `leftJoin`, `rightJoin`, and `join` (inner join). Each of these perform a simple join and return a "JoinHelper" object, where you call the `on` method and return the join condition.
+It is possible to make joins (even the most complex ones) using a simple
+syntax: there are the methods `leftJoin`, `rightJoin`, and `join` (inner join).
+Each of these perform a simple join and return a "JoinHelper" object, where you
+call the `on` method and return the join condition.
 
 ```scala
 People join 'addresses on { (p, a) => p('id) == a('person_id) }
@@ -68,7 +79,10 @@ People join 'addresses on { (p, a) => p('id) == a('person_id) }
 ```
 
 ## Results
-By default, each command prepares the query but never really tries to find anything on database. So, you should call "results" to fetch the results of the query. These will give you a List of Attributes, so you can convert these to any format you desire:
+By default, each command prepares the query but never really tries to find
+anything on database. So, you should call "results" to fetch the results of the
+query. These will give you a List of Attributes, so you can convert these to
+any format you desire:
 
 ```scala
 val people = People query { implicit p =>
@@ -84,4 +98,6 @@ people.foreach { p =>
 
 Note that "count" is an `Int`, because of `as Int` part of the code.
 
-Relational Scala doesn't tries to be "type-safe": indeed, SQL itself is not "static typed": you can, for instance, cast "name" to an INTEGER on SQL, and there is no way to catch this on Scala (or any other language).
+Relational Scala doesn't tries to be "type-safe": indeed, SQL itself is not
+"static typed": you can, for instance, cast "name" to an INTEGER on SQL, and
+there is no way to catch this on Scala (or any other language).

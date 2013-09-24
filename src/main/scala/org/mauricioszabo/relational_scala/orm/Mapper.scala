@@ -2,10 +2,15 @@ package org.mauricioszabo.relational_scala.orm
 
 import org.mauricioszabo.relational_scala._
 import scala.reflect.ClassTag
-import scala.reflect.runtime.universe._
 import java.lang.reflect.Field
+import org.mauricioszabo.relational_scala.results.Attributes
+import org.mauricioszabo.relational_scala.orm.mapper.LazyResultSet
 
-class Mapper[A <: Mapping](implicit val tag: ClassTag[A]) extends Query with Traversable[A] {
+class Mapper[A <: Mapping](implicit val tag: ClassTag[A])
+    extends QueryBase[LazyResultSet[A]]
+    with mapper.IdentityMap[A]
+    with Traversable[A] {
+
   protected var pk = 'id
   protected var getConnection = config.Connection.getConnection
 
@@ -17,20 +22,28 @@ class Mapper[A <: Mapping](implicit val tag: ClassTag[A]) extends Query with Tra
   }
   private lazy val mod = classOf[Field].getDeclaredField("modifiers")
 
-  //override def all: Selector with Finder[A] = this match {
-  //  case s: Selector with Query => s
-  //  case _ => new Selector(select=List(table.*), from=List(table)) with Finder[A]
-  //}
+  def foreach[U](fn: A => U) = toLazyResultSet.foreach(fn)
 
-  def foreach[U](fn: A => U) = {
-    val connection = getConnection()
+  protected[relational_scala] def withSelector(s: Selector => Selector) = toLazyResultSet.withSelector(s)
 
-    all.copy(connection=connection).results.foreach { attributes =>
-      val instance = klass.newInstance
-      val map = attributes.attribute.map { case(k, v) => (k, v.obj) }
-      mappings.set(instance, map)
-      fn(instance.asInstanceOf[A])
+  private def toLazyResultSet = {
+    val c = this.getConnection
+    val mapThisTo = this.mapTo(_: Attributes)
+    val thisTable = this.table
+
+    new Selector(select=List(table.*), from=List(table)) with LazyResultSet[A] {
+      protected val getConnection = c
+      def mapTo(a: Attributes): A = mapThisTo(a)
+
+      this.table = thisTable
     }
+  }
+
+  def mapTo(attributes: Attributes): A = {
+    val instance = klass.newInstance
+    val map = attributes.attribute.map { case(k, v) => (k, v.obj) }
+    mappings.set(instance, map)
+    instance.asInstanceOf[A]
   }
 
   //def find(id: Any) = where { table(pk) -> id }.head

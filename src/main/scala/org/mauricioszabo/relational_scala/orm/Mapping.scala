@@ -49,13 +49,7 @@ trait Mapping {
   }
 
   private def allErrors = {
-    val propertyClass = classOf[Property[_]]
-
-    val properties = getClass.getMethods.view.filter { e =>
-      e.getParameterTypes.size == 0 && propertyClass.isAssignableFrom(e.getReturnType)
-    }
-
-    properties.map { p =>
+    allProperties.map { p =>
       val property = p.invoke(this).asInstanceOf[Property[_]]
       if(property.isValid) {
         null
@@ -63,5 +57,21 @@ trait Mapping {
         (Symbol(p.getName), property.errorMessage)
       }
     }.filter( _ != null )
+  }
+
+  override def toString() = {
+    val old = super.toString
+    val propertiesAndResults = allProperties.map { p =>
+      p.getName + "=" + p.invoke(this).asInstanceOf[Property[_]].value
+    }
+    old + "("+ propertiesAndResults.mkString(", ") +")"
+  }
+
+  private def allProperties = {
+    val propertyClass = classOf[Property[_]]
+
+    getClass.getMethods.view.filter { e =>
+      e.getParameterTypes.size == 0 && propertyClass.isAssignableFrom(e.getReturnType)
+    }
   }
 }

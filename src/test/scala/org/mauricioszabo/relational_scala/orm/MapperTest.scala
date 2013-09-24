@@ -9,7 +9,7 @@ class Person extends Mapping {
   val mappings: Map[Symbol, Any] = Map('a -> 10)
 }
 
-class FinderTest extends WordSpec with matchers.ShouldMatchers with tests.DatabaseSetup {
+class MapperTest extends WordSpec with matchers.ShouldMatchers with tests.DatabaseSetup {
   object People extends Mapper[Person] {
     pk = 'id
     table = "scala_people"
@@ -18,13 +18,15 @@ class FinderTest extends WordSpec with matchers.ShouldMatchers with tests.Databa
 
   "Mapper" should {
     "find all records" in {
+      println(People.where { p => p('name) == "Foo" }.where { p => p('age) == 18 } )
+      println(People.where { p => p('name) == "Foo" }.where { p => p('age) == 18 }.partial.toPseudoSQL )
       val names = People.map { p => p.name.value }
       names.toList should be === List("Foo", "Foo", "Bar")
     }
 
-    "find a record by primary key" in {
-      //val person = People find 3
-      //person.name.value should be === "Bar"
-    }
+    //"find a record by primary key" in {
+    //  val person = People find 3
+    //  person.name.value should be === "Bar"
+    //}
   }
 }

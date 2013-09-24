@@ -3,12 +3,12 @@ package org.mauricioszabo.relational_scala.joins
 import org.mauricioszabo.relational_scala.tables.TableLike
 import org.mauricioszabo.relational_scala._
 
-class JoinHelper(query: QueryBase, otherTable: TableLike, joinKind: Symbol) {
-  def on(fn: (TableLike, TableLike) => comparissions.Comparission) = {
+class JoinHelper[A](query: QueryBase[A], otherTable: TableLike, joinKind: Symbol) {
+  def on(fn: (TableLike, TableLike) => comparissions.Comparission): A = {
     val comparission = fn(query.table, otherTable)
     val join = createJoin(comparission)
     val joins = concatenateJoin(join)
-    query.newSelector { query.all.copy(join=joins) }
+    query.withSelector { s => s.copy(join=joins) }
   }
 
   private def createJoin(comparission: comparissions.Comparission) = joinKind match {

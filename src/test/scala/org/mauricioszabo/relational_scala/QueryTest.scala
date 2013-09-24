@@ -10,16 +10,6 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
     table = "scala_people"
   }
 
-  "A selector" should {
-    "copy with a Query" in {
-      val table = new tables.Table("ex")
-      val selector = Selector(select=List(table('id)), from=List(table))
-      val newSelector = selector.copy(select=List(table('name)))
-      newSelector.isInstanceOf[Query] should be === true
-      newSelector.partial.toPseudoSQL should be === "SELECT ex.name FROM ex"
-    }
-  }
-
   "A Query" should {
     "find records on my database" in {
       val two = People where (p => p('id) > 1 && p('id) < 3) select ('id, 'name)
@@ -32,7 +22,6 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
     }
 
     "finds distinct records" in {
-      pending
       //val people = new tables.Table("scala_people").as("sp")
       //val two = People distinct ('id, 'name) from ('scala_people, people)
       //results(two) should be === List((2, "Foo"))
@@ -82,7 +71,8 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
     }
   }
 
-  def results(sel: Selector) = sel.copy(connection=connection).results.map { e =>
-    (e attribute 'id as Int, e get 'name)
-  }.toList
+  def results(sel: Selector) = {
+    val query = new Selector(sel.copy(connection=connection))() with Query
+    query.results.map { e => (e attribute 'id as Int, e get 'name) }.toList
+  }
 }

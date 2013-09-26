@@ -72,7 +72,7 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
   }
 
   def results(sel: Selector) = {
-    val query = new Selector(sel.copy(connection=connection))() with Query
+    val query = new Selector(sel.copy(connection=connection)) with Query
     query.results.map { e => (e attribute 'id as Int, e get 'name) }.toList
   }
 }

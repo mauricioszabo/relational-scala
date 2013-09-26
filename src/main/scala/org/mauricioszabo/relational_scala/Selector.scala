@@ -12,40 +12,9 @@ case class Selector(
     join: Seq[joins.Join] = Nil,
     order: Seq[Partial] = Nil,
     connection: java.sql.Connection = null
-  ) {
+  ) extends Partial {
 
-  //def this(s: Selector) = this(s.select, s.from, s.where, s.group, s.having, s.join, s.order, s.connection)
-
-  def this(s: Selector)(
-    select: Seq[attributes.AttributeLike] = null,
-    from: Seq[tables.TableLike] = null,
-    where: comparissions.Comparission = null,
-    group: Seq[attributes.AttributeLike] = null,
-    having: comparissions.Comparission = null,
-    join: Seq[joins.Join] = null,
-    order: Seq[Partial] = null,
-    connection: java.sql.Connection = null
-  ) = this(
-    if(select     == null) s.select     else select,
-    if(from       == null) s.from       else from,
-    if(where      == null) s.where      else where,
-    if(group      == null) s.group      else group,
-    if(having     == null) s.having     else having,
-    if(join       == null) s.join       else join,
-    if(order      == null) s.order      else order,
-    if(connection == null) s.connection else connection
-  )
-
-  //def copy(
-  //  select: Seq[attributes.AttributeLike] = select,
-  //  from: Seq[tables.TableLike] = from,
-  //  where: comparissions.Comparission = where,
-  //  group: Seq[attributes.AttributeLike] = group,
-  //  having: comparissions.Comparission = having,
-  //  join: Seq[joins.Join] = join,
-  //  order: Seq[Partial] = order,
-  //  connection: java.sql.Connection = connection
-  //) = new Selector( select, from, where, group, having, join, order, connection) with Query
+  def this(s: Selector) = this(s.select, s.from, s.where, s.group, s.having, s.join, s.order, s.connection)
 
   def results = {
     val statement = partial.createStatement(connection)

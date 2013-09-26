@@ -18,8 +18,6 @@ class MapperTest extends WordSpec with matchers.ShouldMatchers with tests.Databa
 
   "Mapper" should {
     "find all records" in {
-      println(People.where { p => p('name) == "Foo" }.where { p => p('age) == 18 } )
-      println(People.where { p => p('name) == "Foo" }.where { p => p('age) == 18 }.partial.toPseudoSQL )
       val names = People.map { p => p.name.value }
       names.toList should be === List("Foo", "Foo", "Bar")
     }

@@ -1,13 +1,22 @@
 package org.mauricioszabo.relational_scala.orm.mapper
 
-import org.mauricioszabo.relational_scala.{Selector, QueryBase}
+import org.mauricioszabo.relational_scala._
 import org.mauricioszabo.relational_scala.results.Attributes
 import org.mauricioszabo.relational_scala.Partial
 
-trait LazyResultSet[A] extends QueryBase[Selector with LazyResultSet[A]]
+trait LazyResultSet[A] extends QueryBase[LazyResultSet[A]]
     with IdentityMap[A]
     with Traversable[A]
     with Partial {
+
+  val select: Seq[attributes.AttributeLike]
+  val from: Seq[tables.TableLike]
+  val where: comparissions.Comparission
+  val group: Seq[attributes.AttributeLike]
+  val having: comparissions.Comparission
+  val join: Seq[joins.Join]
+  val order: Seq[Partial]
+  val connection: java.sql.Connection
 
   protected val getConnection: () => java.sql.Connection
 

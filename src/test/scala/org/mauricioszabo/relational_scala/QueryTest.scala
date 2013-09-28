@@ -22,6 +22,7 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
     }
 
     "finds distinct records" in {
+      pending
       //val people = new tables.Table("scala_people").as("sp")
       //val two = People distinct ('id, 'name) from ('scala_people, people)
       //results(two) should be === List((2, "Foo"))
@@ -51,8 +52,22 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
       results(names) should be === List( (3, "Bar"), (2, "Foo"), (1, "Foo") )
     }
 
+    "subselect another query" in {
+      val names = People query { implicit p => p order 'id.desc }
+      val r = People query { implicit p => p from names.as("bar") where { p => p('name) -> "Foo" } }
+      results(r) should be === List( (2, "Foo"), (1, "Foo") )
+    }
+
     "order the query with a subselect" in {
-      pending
+      object Addresses extends Query { table = "scala_addresses" }
+
+      val primaryQuery = People select '*
+      val r = primaryQuery order {
+        Addresses where { a => a('id) == primaryQuery.table('id) } select 'address
+      }
+
+      r.partial.toPseudoSQL should be === ("SELECT scala_people.* FROM scala_people ORDER BY " +
+        "(SELECT scala_addresses.address FROM scala_addresses WHERE scala_addresses.id = scala_people.id)")
     }
   }
 

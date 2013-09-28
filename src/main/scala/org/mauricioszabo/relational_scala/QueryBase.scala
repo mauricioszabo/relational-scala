@@ -56,9 +56,9 @@ trait QueryBase[A] {
   }
 
   def where(comp: Comparission) = withSelector { s => s.copy(where=comp) }
-  def where(query: (Symbol => attributes.Attribute) => Comparission) = {
-    implicit val symbol2table = { s: Symbol => table(s) }
-    withSelector { s => s.copy(where=query(symbol2table)) }
+  def where(query: (Symbol => attributes.Attribute) => Comparission) = withSelector { selector =>
+    val symbol2table = { s: Symbol => selector.from.head(s) }
+    selector.copy(where=query(symbol2table))
   }
 
   def join(table: tables.TableLike) = new joins.JoinHelper(this, table, 'inner)

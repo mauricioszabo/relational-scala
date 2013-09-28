@@ -22,10 +22,9 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
     }
 
     "finds distinct records" in {
-      pending
-      //val people = new tables.Table("scala_people").as("sp")
-      //val two = People distinct ('id, 'name) from ('scala_people, people)
-      //results(two) should be === List((2, "Foo"))
+      val people = new tables.Table("scala_people").as("sp")
+      val two = People distinct ('id, 'name) from ('scala_people, people)
+      results(two).size should be === 3
     }
 
     "join another table" in {

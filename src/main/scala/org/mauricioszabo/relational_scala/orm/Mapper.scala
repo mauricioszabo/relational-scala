@@ -5,6 +5,7 @@ import scala.reflect.ClassTag
 import java.lang.reflect.Field
 import org.mauricioszabo.relational_scala.results.Attributes
 import org.mauricioszabo.relational_scala.orm.mapper.LazyResultSet
+import org.mauricioszabo.relational_scala.clauses.Select
 
 class Mapper[A <: Mapping](implicit val tag: ClassTag[A])
     extends QueryBase[LazyResultSet[A]]
@@ -31,7 +32,10 @@ class Mapper[A <: Mapping](implicit val tag: ClassTag[A])
     val mapThisTo = this.mapTo(_: Attributes)
     val thisTable = this.table
 
-    new Selector(select=List(table.*), from=List(table)) with LazyResultSet[A] {
+    new Selector(
+                  select=new Select(false, table, new attributes.All()),
+                  from=List(table)
+                ) with LazyResultSet[A] {
       protected val getConnection = c
       def mapTo(a: Attributes): A = mapThisTo(a)
 

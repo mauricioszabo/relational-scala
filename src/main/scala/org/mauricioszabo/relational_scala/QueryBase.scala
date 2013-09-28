@@ -1,5 +1,6 @@
 package org.mauricioszabo.relational_scala
 import org.mauricioszabo.relational_scala.comparissions.Comparission
+import org.mauricioszabo.relational_scala.clauses.Select
 
 trait QueryBase[A] {
   private var relationalTable: tables.TableLike = {
@@ -23,8 +24,12 @@ trait QueryBase[A] {
   }
 
   def select(attributes: Any*) = withSelector { s =>
+    s.copy(select=Select.select(table, attributes: _*))
+  }
+
+  def distinct(attributes: Any*) = withSelector { s =>
     val converted = convert(attributes.toList)
-    s.copy(select=converted)
+    s.copy(select=Select.distinct(table, attributes: _*))
   }
 
   def group(attributes: Any*) = withSelector { s =>

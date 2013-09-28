@@ -4,7 +4,7 @@ import org.mauricioszabo.relational_scala._
 import org.mauricioszabo.relational_scala.results._
 
 case class Selector(
-    select: Seq[attributes.AttributeLike],
+    select: clauses.Select,
     from: Seq[tables.TableLike],
     where: comparissions.Comparission = null,
     group: Seq[attributes.AttributeLike] = Nil,
@@ -42,11 +42,8 @@ case class Selector(
   }
 
   private def constructSelect = {
-    val(query, attributes) = select.foldLeft( (Seq[String](), Seq[Any]()) ) { case ((query, attributes), partial) =>
-      val sp = partial.selectPartial
-      ( query :+ sp.query, attributes ++ sp.attributes)
-    }
-    ("SELECT " + query.mkString(", "), attributes)
+    val partial = select.partial
+    (partial.query, partial.attributes)
   }
 
   private def multiElementsQuery(before: String, elements: Seq[Partial], tuple: (String, Seq[Any])): (String, Seq[Any]) = {

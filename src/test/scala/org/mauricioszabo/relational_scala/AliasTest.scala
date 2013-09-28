@@ -31,13 +31,13 @@ class AliasTest extends WordSpec with matchers.ShouldMatchers {
   }
 
   "Alias in select" should {
+    val selector = new Selector(new clauses.Select(false, people, 'id), Seq(people))
+
     "rename queries" in {
-      val selector = new Selector(Seq(people('id)), Seq(people))
       selector.as("sql").partial.toPseudoSQL should be === "(SELECT people.id FROM people) sql"
     }
 
     "rename attributes within those queries" in {
-      val selector = new Selector(Seq(people('id)), Seq(people))
       val alias = selector.as("sql")
       alias('id).partial.toPseudoSQL should be === "sql.id"
     }

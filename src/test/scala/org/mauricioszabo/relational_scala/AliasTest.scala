@@ -29,4 +29,17 @@ class AliasTest extends WordSpec with matchers.ShouldMatchers {
       people('id).as("foo").as("bar").partial.toPseudoSQL should be === "bar"
     }
   }
+
+  "Alias in select" should {
+    "rename queries" in {
+      val selector = new Selector(Seq(people('id)), Seq(people))
+      selector.as("sql").partial.toPseudoSQL should be === "(SELECT people.id FROM people) sql"
+    }
+
+    "rename attributes within those queries" in {
+      val selector = new Selector(Seq(people('id)), Seq(people))
+      val alias = selector.as("sql")
+      alias('id).partial.toPseudoSQL should be === "sql.id"
+    }
+  }
 }

@@ -15,34 +15,33 @@ class SelectorTest extends WordSpec with DatabaseSetup with ShouldMatchers {
 
   "Selector" should {
     val select = Select.select(people, people.*)
+    val selector = Selector(from=List(people), select=select)
+
     "create a SQL" in {
-      var selector = Selector(from=List(people), select=select)
       selector.partial.toPseudoSQL should be === "SELECT scala_people.* FROM scala_people"
 
-      selector = Selector(from=List(people), select=select, where=(people("id") == 10))
-      selector.partial.toPseudoSQL should be === "SELECT scala_people.* FROM scala_people WHERE scala_people.id = 10"
+      val selector2 = selector.copy(where=(people("id") == 10))
+      selector2.partial.toPseudoSQL should be === "SELECT scala_people.* FROM scala_people WHERE scala_people.id = 10"
     }
 
     "search for records in a database" in {
-      val selector = Selector(
-        from=List(people), select=select, where=(people("id") <= 2), connection=connection)
-      val ids = selector.results.map(_ attribute 'id as Int)
+      val selector2 = selector.copy(where=(people("id") <= 2), connection=connection)
+      val ids = selector2.results.map(_ attribute 'id as Int)
       ids.toList should be === List(1, 2)
     }
 
     "search with a string" in {
-      val selector = Selector(from=List(people), select=select, where=(people("name") == "Foo"), connection=connection)
-      val ids = selector.results.map(_ attribute 'id as Int)
+      val selector2 = selector.copy(where=(people("name") == "Foo"), connection=connection)
+      val ids = selector2.results.map(_ attribute 'id as Int)
       ids.toList should be === List(1, 2)
     }
 
     "select using operations" in {
-      val selector = Selector(
-        from=List(people),
+      val selector2 = selector.copy(
         select=Select.select(people, people('id) == 1),
         connection=connection
       )
-      val results = selector.results.map(_.attribute.values.toList(0).value).toList
+      val results = selector2.results.map(_.attribute.values.toList(0).value).toList
       results should be === List("true", "false", "false")
     }
 

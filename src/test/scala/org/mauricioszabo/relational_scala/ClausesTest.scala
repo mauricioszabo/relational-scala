@@ -20,4 +20,12 @@ class ClausesTest extends WordSpec with ShouldMatchers with DatabaseSetup {
       select.partial.toPseudoSQL should be === "SELECT DISTINCT foo.one, foo.two"
     }
   }
+
+  "Partial" should {
+    "join with another" in {
+      val comp = table('id) == 10
+      val select = new Select(false, table, 'one)
+      select.appendPartial(comp).partial.toPseudoSQL should be === "SELECT foo.one foo.id = 10"
+    }
+  }
 }

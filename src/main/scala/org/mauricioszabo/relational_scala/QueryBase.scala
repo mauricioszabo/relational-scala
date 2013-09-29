@@ -9,7 +9,11 @@ trait QueryBase[A] {
     new tables.Table(name)
   }
 
-  def table = relationalTable
+  def table: tables.TableLike = this match {
+    case s: Selector with QueryBase[A] => s.from.head
+    case _ => relationalTable
+  }
+
   protected def table_=(tableName: String) { relationalTable = new tables.Table(tableName) }
   protected def table_=(table: tables.TableLike) { relationalTable = table }
 
@@ -75,8 +79,9 @@ trait QueryBase[A] {
   def rightJoin(table: tables.TableLike) = new joins.JoinHelper(this, table, 'right)
   def rightJoin(table: Symbol): joins.JoinHelper[A] = rightJoin(new tables.Table(table.name))
 
-  def order(orders: Partial*) = {
-    withSelector { s => s.copy(order=orders) }
+  def order(orders: Partial*) = withSelector { s => s.copy(order=orders) }
+  def order(orders: tables.TableLike => Seq[Partial]) = withSelector { s =>
+    s.copy(order=orders(table))
   }
 
   protected[relational_scala] def withSelector(fn: Selector => Selector): A

@@ -45,6 +45,13 @@ class SelectorTest extends WordSpec with DatabaseSetup with ShouldMatchers {
       results should be === List("true", "false", "false")
     }
 
+    "With pagination" should {
+      "paginate the results" in {
+        val s = selector.copy(limit=1, offset=2)
+        s.partial.toPseudoSQL should be === "SELECT scala_people.* FROM scala_people LIMIT 1 OFFSET 2"
+      }
+    }
+
     "search with a date" in {
       pending
       val selector = Selector(from=List(people), select=select,

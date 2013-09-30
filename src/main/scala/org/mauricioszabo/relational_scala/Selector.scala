@@ -11,10 +11,12 @@ case class Selector(
     having: comparissions.Comparission = null,
     join: Seq[joins.Join] = Nil,
     order: Seq[Partial] = Nil,
-    connection: java.sql.Connection = null
+    connection: java.sql.Connection = null,
+    limit: Int = -1,
+    offset: Int = -1
   ) extends FullSelect {
 
-  def this(s: Selector) = this(s.select, s.from, s.where, s.group, s.having, s.join, s.order, s.connection)
+  def this(s: Selector) = this(s.select, s.from, s.where, s.group, s.having, s.join, s.order, s.connection, s.limit, s.offset)
 
   def results = try {
     new Promisse(resultSet)
@@ -38,7 +40,9 @@ case class Selector(
     if(!order.isEmpty) tuple = constructOrder(tuple)
 
     val(query, list) = tuple
-    new PartialStatement(query, list)
+
+    val pagination = new Pagination(query, list, limit=limit, offset=offset)
+    pagination.partial
   }
 
   private def constructSelect = {

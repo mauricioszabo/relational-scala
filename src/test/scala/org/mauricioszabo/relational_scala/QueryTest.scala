@@ -22,9 +22,9 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
     }
 
     "finds distinct records" in {
-      //val people = new tables.Table("scala_people").as("sp")
-      //val two = People distinct ('id, 'name) from ('scala_people, people)
-      //results(two) should be === List((2, "Foo"))
+      val people = new tables.Table("scala_people").as("sp")
+      val two = People distinct ('id, 'name) from ('scala_people, people)
+      results(two).size should be === 3
     }
 
     "join another table" in {
@@ -47,12 +47,26 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
     }
 
     "order the query" in {
-      val names = People query { implicit p => p order 'id.desc }
-      results(names) should be === List( (3, "Bar"), (2, "Foo"), (1, "Foo") )
+      val desc = People query { implicit p => p order 'id.desc }
+      results(desc) should be === List( (3, "Bar"), (2, "Foo"), (1, "Foo") )
+    }
+
+    "subselect another query" in {
+      val desc = People query { implicit p => p order 'id.desc }
+      val r = People query { implicit p => p from desc.as("bar") where { p => p('name) -> "Foo" } }
+      results(r) should be === List( (2, "Foo"), (1, "Foo") )
     }
 
     "order the query with a subselect" in {
-      pending
+      object Addresses extends Query { table = "scala_addresses" }
+
+      val primaryQuery = People select '*
+      val r = primaryQuery order {
+        Addresses where { a => a('id) == primaryQuery.table('id) } select 'address
+      }
+
+      r.partial.toPseudoSQL should be === ("SELECT scala_people.* FROM scala_people ORDER BY " +
+        "(SELECT scala_addresses.address FROM scala_addresses WHERE scala_addresses.id = scala_people.id)")
     }
   }
 
@@ -68,6 +82,24 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
     "find records using symbols and 'query' method" in {
       val two = People query { implicit p => p where ('id > 1 && 'id < 3) select ('id, 'name) }
       results(two) should be === List((2, "Foo"))
+    }
+  }
+
+  "Query on more than one table" should {
+    "cast to the first table in FROM" in {
+      val desc = People query { implicit p => p order 'id.desc }
+      val result = People query { implicit p => p
+        .from(desc as "sql")
+        .order { p => Seq(p.name) }
+        .join('scala_addresses).on { (p, a) => p.id == a.person_id }
+        .select('id)
+      }
+
+      result.partial.toPseudoSQL should be === (
+        "SELECT sql.id FROM (SELECT * FROM scala_people ORDER BY (scala_people.id) DESC) sql " +
+        "INNER JOIN scala_addresses ON sql.id = scala_addresses.person_id " +
+        "ORDER BY sql.name"
+      )
     }
   }
 

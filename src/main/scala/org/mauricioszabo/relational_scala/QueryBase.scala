@@ -1,5 +1,6 @@
 package org.mauricioszabo.relational_scala
 import org.mauricioszabo.relational_scala.comparissions.Comparission
+import org.mauricioszabo.relational_scala.clauses.Select
 
 trait QueryBase[A] {
   private var relationalTable: tables.TableLike = {
@@ -8,7 +9,11 @@ trait QueryBase[A] {
     new tables.Table(name)
   }
 
-  def table = relationalTable
+  def table: tables.TableLike = this match {
+    case s: Selector with QueryBase[A] => s.from.head
+    case _ => relationalTable
+  }
+
   protected def table_=(tableName: String) { relationalTable = new tables.Table(tableName) }
   protected def table_=(table: tables.TableLike) { relationalTable = table }
 
@@ -23,8 +28,12 @@ trait QueryBase[A] {
   }
 
   def select(attributes: Any*) = withSelector { s =>
+    s.copy(select=Select.select(table, attributes: _*))
+  }
+
+  def distinct(attributes: Any*) = withSelector { s =>
     val converted = convert(attributes.toList)
-    s.copy(select=converted)
+    s.copy(select=Select.distinct(table, attributes: _*))
   }
 
   def group(attributes: Any*) = withSelector { s =>
@@ -56,9 +65,9 @@ trait QueryBase[A] {
   }
 
   def where(comp: Comparission) = withSelector { s => s.copy(where=comp) }
-  def where(query: (Symbol => attributes.Attribute) => Comparission) = {
-    implicit val symbol2table = { s: Symbol => table(s) }
-    withSelector { s => s.copy(where=query(symbol2table)) }
+  def where(query: (Symbol => attributes.Attribute) => Comparission) = withSelector { selector =>
+    val symbol2table = { s: Symbol => selector.from.head(s) }
+    selector.copy(where=query(symbol2table))
   }
 
   def join(table: tables.TableLike) = new joins.JoinHelper(this, table, 'inner)
@@ -70,8 +79,9 @@ trait QueryBase[A] {
   def rightJoin(table: tables.TableLike) = new joins.JoinHelper(this, table, 'right)
   def rightJoin(table: Symbol): joins.JoinHelper[A] = rightJoin(new tables.Table(table.name))
 
-  def order(orders: Partial*) = {
-    withSelector { s => s.copy(order=orders) }
+  def order(orders: Partial*) = withSelector { s => s.copy(order=orders) }
+  def order(orders: tables.TableLike => Seq[Partial]) = withSelector { s =>
+    s.copy(order=orders(table))
   }
 
   protected[relational_scala] def withSelector(fn: Selector => Selector): A

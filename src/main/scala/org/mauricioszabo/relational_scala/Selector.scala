@@ -4,29 +4,28 @@ import org.mauricioszabo.relational_scala._
 import org.mauricioszabo.relational_scala.results._
 
 case class Selector(
-    select: Seq[attributes.AttributeLike],
+    select: clauses.Select,
     from: Seq[tables.TableLike],
     where: comparissions.Comparission = null,
     group: Seq[attributes.AttributeLike] = Nil,
     having: comparissions.Comparission = null,
     join: Seq[joins.Join] = Nil,
     order: Seq[Partial] = Nil,
-    connection: java.sql.Connection = null
-  ) extends Partial {
+    connection: java.sql.Connection = null,
+    limit: Int = -1,
+    offset: Int = -1
+  ) extends FullSelect {
 
-  def this(s: Selector) = this(s.select, s.from, s.where, s.group, s.having, s.join, s.order, s.connection)
+  def this(s: Selector) = this(s.select, s.from, s.where, s.group, s.having, s.join, s.order, s.connection, s.limit, s.offset)
 
-  def results = {
-    val statement = partial.createStatement(connection)
-    try {
-      new Promisse(statement.executeQuery)
-    } catch {
-      case e: java.sql.SQLException => throw new java.sql.SQLException(
-        "Error on SQL string: the offending code was:\n" +
-        partial.toPseudoSQL + ";",
-        e
-      )
-    }
+  def results = try {
+    new Promisse(resultSet)
+  } catch {
+    case e: java.sql.SQLException => throw new java.sql.SQLException(
+      "Error on SQL string: the offending code was:\n" +
+      partial.toPseudoSQL + ";",
+      e
+    )
   }
 
   lazy val partial = {
@@ -41,15 +40,14 @@ case class Selector(
     if(!order.isEmpty) tuple = constructOrder(tuple)
 
     val(query, list) = tuple
-    new PartialStatement(query, list)
+
+    val pagination = new Pagination(query, list, limit=limit, offset=offset)
+    pagination.partial
   }
 
   private def constructSelect = {
-    val(query, attributes) = select.foldLeft( (Seq[String](), Seq[Any]()) ) { case ((query, attributes), partial) =>
-      val sp = partial.selectPartial
-      ( query :+ sp.query, attributes ++ sp.attributes)
-    }
-    ("SELECT " + query.mkString(", "), attributes)
+    val partial = select.partial
+    (partial.query, partial.attributes)
   }
 
   private def multiElementsQuery(before: String, elements: Seq[Partial], tuple: (String, Seq[Any])): (String, Seq[Any]) = {
@@ -71,9 +69,14 @@ case class Selector(
 
   private def constructOrder(tuple: (String, Seq[Any])) = {
     val (tquery, tattributes) = tuple
-    val(query, attributes) = order.foldLeft( (Seq[String](), Seq[Any]()) ) { case ((query, attributes), partial) =>
+    val(query, attributes) = order.foldLeft( (Seq[String](), tattributes) ) { case ((query, attributes), partial) =>
       val sp = partial.partial
-      ( query :+ sp.query, attributes ++ sp.attributes)
+      val q = if(partial.isInstanceOf[FullSelect])
+        "(" + sp.query + ")"
+      else
+        sp.query
+
+      ( query :+ q, attributes ++ sp.attributes)
     }
 
     val rquery = tquery + " ORDER BY " + query.mkString("), (")

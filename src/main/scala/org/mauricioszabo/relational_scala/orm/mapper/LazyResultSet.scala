@@ -17,6 +17,8 @@ trait LazyResultSet[A] extends QueryBase[LazyResultSet[A]]
   val join: Seq[joins.Join]
   val order: Seq[Partial]
   val connection: java.sql.Connection
+  val limit: Int
+  val offset: Int
 
   protected val getConnection: () => java.sql.Connection
 

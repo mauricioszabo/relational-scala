@@ -18,4 +18,10 @@ trait Partial {
       def partial = new PartialStatement(q, a)
     }
   }
+
+  def equivalentTo(other: Partial) = {
+    val PartialStatement(thisQuery, thisAttributes) = this.partial
+    val PartialStatement(otherQuery, otherAttributes) = other.partial
+    thisQuery == otherQuery && thisAttributes == otherAttributes
+  }
 }

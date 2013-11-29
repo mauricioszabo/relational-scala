@@ -3,7 +3,11 @@ package org.mauricioszabo.relational_scala.comparissions
 import org.mauricioszabo.relational_scala.attributes._
 import org.mauricioszabo.relational_scala.PartialStatement
 
-class Equality(comparission: String, attribute: AttributeLike, other: Any) extends Comparission {
+class Equality(
+  protected val comparission: String,
+  protected val attribute: AttributeLike,
+  protected val other: Any) extends Comparission {
+
   lazy val partial = other match {
     case a: AttributeLike => new PartialStatement(query + a.partial.query, ap.attributes ++ a.partial.attributes)
     case null => handleNull

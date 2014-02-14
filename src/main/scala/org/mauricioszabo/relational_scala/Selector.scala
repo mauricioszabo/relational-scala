@@ -6,9 +6,9 @@ import org.mauricioszabo.relational_scala.results._
 case class Selector(
     select: clauses.Select,
     from: Seq[tables.TableLike],
-    where: comparissions.Comparission = null,
+    where: comparissions.Comparission = comparissions.None,
     group: Seq[attributes.AttributeLike] = Nil,
-    having: comparissions.Comparission = null,
+    having: comparissions.Comparission = comparissions.None,
     join: Seq[joins.Join] = Nil,
     order: Seq[Partial] = Nil,
     connection: java.sql.Connection = null,
@@ -33,9 +33,9 @@ case class Selector(
     tuple = multiElementsQuery(" FROM ", from, tuple)
     join.foreach { j => tuple = constructQuery(tuple, " ", j) }
 
-    if(where != null) tuple = whereQuery(" WHERE ", tuple)
+    if(where != comparissions.None) tuple = whereQuery(" WHERE ", tuple, where)
     tuple = multiElementsQuery(" GROUP BY ", group, tuple)
-    if(having != null) tuple = whereQuery(" HAVING ", tuple)
+    if(having != comparissions.None) tuple = whereQuery(" HAVING ", tuple, having)
 
     if(!order.isEmpty) tuple = constructOrder(tuple)
 
@@ -56,7 +56,7 @@ case class Selector(
     rest.foldLeft(constructQuery(tuple, before, first)) { constructQuery(_, ",", _) }
   }
 
-  private def whereQuery(before: String, tuple: (String, Seq[Any])) = {
+  private def whereQuery(before: String, tuple: (String, Seq[Any]), where: comparissions.Comparission) = {
     constructQuery(tuple, before, where)
   }
 

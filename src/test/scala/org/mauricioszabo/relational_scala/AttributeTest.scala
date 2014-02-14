@@ -1,3 +1,5 @@
+package tests
+
 import org.scalatest.WordSpec
 import org.scalatest.matchers.ShouldMatchers
 
@@ -96,6 +98,25 @@ class AttributeTest extends WordSpec with ShouldMatchers {
     "define order in SQL clauses" in {
       orders.Ascending(name).partial.toPseudoSQL should be === "(examples.name) ASC"
       orders.Descending(name).partial.toPseudoSQL should be === "(examples.name) DESC"
+    }
+  }
+
+  "NULL attribute" should {
+    import comparissions.None
+    val nameFoo = name == "foo"
+
+    "not enter in OR" in {
+      attributeSql(None || nameFoo) should be === "examples.name = 'foo'"
+      attributeSql(nameFoo || None) should be === "examples.name = 'foo'"
+    }
+
+    "not enter in AND" in {
+      attributeSql(None && nameFoo) should be === "examples.name = 'foo'"
+      attributeSql(nameFoo && None) should be === "examples.name = 'foo'"
+    }
+
+    "not enter in NOT" in {
+      attributeSql(!None) should be === ""
     }
   }
 

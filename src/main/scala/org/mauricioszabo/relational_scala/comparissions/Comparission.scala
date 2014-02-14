@@ -4,9 +4,15 @@ import org.mauricioszabo.relational_scala._
 import org.mauricioszabo.relational_scala.comparissions._
 
 trait Comparission extends attributes.Comparable {
-  def unary_! = new Not(this)
+  protected def present = true
 
-  def ||(other: Comparission): Comparission = new Or(List(this, other))
-  def &&(other: Comparission): Comparission = new And(List(this, other))
+  def unary_! : Comparission = new Not(this)
+
+  def ||(other: Comparission): Comparission =
+    if(other.present) new Or(List(this, other))
+    else this
+
+  def &&(other: Comparission): Comparission =
+    if(other.present) new And(List(this, other))
+    else this
 }
-

@@ -4,13 +4,15 @@ import org.mauricioszabo.relational_scala.results.{Attribute => RAttribute}
 import org.mauricioszabo.relational_scala.results.Attributes
 import scala.language.implicitConversions
 import scala.language.dynamics
+import org.mauricioszabo.relational_scala.Selector
 
 class DynamicAttr(a: => Attributes) extends Dynamic {
   def selectDynamic(key: String) = new Attribute(a.attribute get Symbol(key))
 }
 
-trait Mapping {
+trait Mapping extends AssociationDefinition {
   protected val mappings: Map[Symbol, Any]
+  protected var query: Selector = null
 
   def attributes = new Attributes(
     mappings.map { case(key, value) => (key, RAttribute(value)) }

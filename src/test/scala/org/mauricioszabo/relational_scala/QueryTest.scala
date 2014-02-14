@@ -11,12 +11,22 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
   }
 
   "A Query" should {
-    "find records on my database" in {
+    "find all records on a table" in {
+      val result = People.all
+      results(result).size should be === 3
+    }
+
+    "find records on a table" in {
       val two = People where (p => p('id) > 1 && p('id) < 3) select ('id, 'name)
       results(two) should be === List((2, "Foo"))
     }
 
-    "finds records reusing 'table' object" in {
+    "find records using HAVING" in {
+      val two = People having (p => p('id) > 1 && p('id) < 3) select ('id, 'name) group ('id)
+      results(two) should be === List((2, "Foo"))
+    }
+
+    "find records reusing 'table' object" in {
       val two = People query { p => p where (p('id) > 1 && p('id) < 3) select (p('id), p('name)) }
       results(two) should be === List((2, "Foo"))
     }
@@ -32,6 +42,13 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
       results(address) should be === List((1, "Foo"), (1, "Foo"), (2, "Foo"))
     }
 
+    "join another with a join object" in {
+      val table = new tables.Table("scala_addresses")
+      val join = new joins.InnerJoin(table, table('person_id) == People.table('id))
+      val address = People join Seq(join)
+      results(address) should be === List((1, "Foo"), (1, "Foo"), (2, "Foo"))
+    }
+
     "left join another table" in {
       val address = People leftJoin 'scala_addresses on { (p, a) => p('id) == a('person_id) }
       results(address) should be === List((1, "Foo"), (1, "Foo"), (2, "Foo"), (3, "Bar"))
@@ -40,7 +57,7 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
     "counts records on table" in {
       val names = People query { implicit p => p select ('name.count.as("count"), 'name) group 'name }
 
-      val results = names.copy(connection=connection).results.map { e =>
+      val results = names.copy(connection=globalConnection).results.map { e =>
         (e attribute 'count as Int, e get 'name)
       }
       results should be === List( (2, "Foo"), (1, "Bar") )
@@ -104,7 +121,7 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
   }
 
   def results(sel: Selector) = {
-    val query = new Selector(sel.copy(connection=connection)) with Query
+    val query = new Selector(sel.copy(connection=globalConnection)) with Query
     query.results.map { e => (e attribute 'id as Int, e get 'name) }.toList
   }
 }

@@ -12,7 +12,7 @@ trait Query extends QueryBase[Selector with Query] {
     ) with Query
   }
 
-  protected[relational_scala] def withSelector(fn: Selector => Selector) = {
+  protected def withSelector(fn: Selector => Selector) = {
     val selector = new Selector(fn(toSelector)) with Query
     selector.table = table
     selector

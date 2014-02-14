@@ -8,7 +8,7 @@ class JoinHelper[A](query: QueryBase[A], otherTable: TableLike, joinKind: Symbol
     val comparission = fn(query.table, otherTable)
     val join = createJoin(comparission)
     val joins = concatenateJoin(join)
-    query.withSelector { s => s.copy(join=joins) }
+    query.join(joins)
   }
 
   private def createJoin(comparission: comparissions.Comparission) = joinKind match {

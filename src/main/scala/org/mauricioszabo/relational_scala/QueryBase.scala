@@ -64,14 +64,23 @@ trait QueryBase[A] {
     }
   }
 
+  def all = withSelector { s => s }
+
   def where(comp: Comparission) = withSelector { s => s.copy(where=comp) }
   def where(query: (Symbol => attributes.Attribute) => Comparission) = withSelector { selector =>
     val symbol2table = { s: Symbol => selector.from.head(s) }
     selector.copy(where=query(symbol2table))
   }
 
+  def having(comp: Comparission) = withSelector { s => s.copy(having=comp) }
+  def having(query: (Symbol => attributes.Attribute) => Comparission) = withSelector { selector =>
+    val symbol2table = { s: Symbol => selector.from.head(s) }
+    selector.copy(having=query(symbol2table))
+  }
+
   def join(table: tables.TableLike) = new joins.JoinHelper(this, table, 'inner)
   def join(table: Symbol): joins.JoinHelper[A] = join(new tables.Table(table.name))
+  def join(js: Seq[joins.Join]): A = withSelector { s => s.copy(join=js) }
 
   def leftJoin(table: tables.TableLike) = new joins.JoinHelper(this, table, 'left)
   def leftJoin(table: Symbol): joins.JoinHelper[A] = leftJoin(new tables.Table(table.name))
@@ -84,5 +93,5 @@ trait QueryBase[A] {
     s.copy(order=orders(table))
   }
 
-  protected[relational_scala] def withSelector(fn: Selector => Selector): A
+  protected def withSelector(fn: Selector => Selector): A
 }

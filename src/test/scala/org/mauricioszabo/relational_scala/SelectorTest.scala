@@ -25,13 +25,13 @@ class SelectorTest extends WordSpec with DatabaseSetup with ShouldMatchers {
     }
 
     "search for records in a database" in {
-      val selector2 = selector.copy(where=(people("id") <= 2), connection=connection)
+      val selector2 = selector.copy(where=(people("id") <= 2), connection=globalConnection)
       val ids = selector2.results.map(_ attribute 'id as Int)
       ids.toList should be === List(1, 2)
     }
 
     "search with a string" in {
-      val selector2 = selector.copy(where=(people("name") == "Foo"), connection=connection)
+      val selector2 = selector.copy(where=(people("name") == "Foo"), connection=globalConnection)
       val ids = selector2.results.map(_ attribute 'id as Int)
       ids.toList should be === List(1, 2)
     }
@@ -39,7 +39,7 @@ class SelectorTest extends WordSpec with DatabaseSetup with ShouldMatchers {
     "select using operations" in {
       val selector2 = selector.copy(
         select=Select.select(people, people('id) == 1),
-        connection=connection
+        connection=globalConnection
       )
       val results = selector2.results.map(_.attribute.values.toList(0).value).toList
       results should be === List("true", "false", "false")
@@ -55,7 +55,7 @@ class SelectorTest extends WordSpec with DatabaseSetup with ShouldMatchers {
     "search with a date" in {
       pending
       val selector = Selector(from=List(people), select=select,
-        where=(people("birth") < java.sql.Date.valueOf("1990-01-01")), connection=connection)
+        where=(people("birth") < java.sql.Date.valueOf("1990-01-01")), connection=globalConnection)
       val ids = selector.results.map(_ attribute 'id as Int)
       ids.toList should be === List(1, 3)
     }

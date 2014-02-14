@@ -9,10 +9,4 @@ class Or(protected val comparissions: List[Comparission]) extends Comparission {
     val attributes = partials.flatMap { _.attributes }
     new PartialStatement(query, attributes)
   }
-
-  def equivalentTo(other: Or) = {
-    if(comparissions.size != other.comparissions.size)
-      false
-    else { false }
-  }
 }

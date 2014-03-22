@@ -3,7 +3,7 @@ package tests.orm
 import org.scalatest._
 import org.scalatest.matchers.ShouldMatchers
 
-import org.mauricioszabo.relational_scala.orm._
+import relational.orm._
 
 class MappingTest extends WordSpec with tests.DatabaseSetup with ShouldMatchers {
   class Person(p: (Symbol, Any) *) extends Mapping {

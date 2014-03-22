@@ -1,4 +1,4 @@
-package org.mauricioszabo.relational_scala.orm.config
+package relational.orm.config
 
 object I18n {
   private val errors = Map(

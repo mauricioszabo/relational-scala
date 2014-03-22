@@ -1,8 +1,8 @@
-package org.mauricioszabo.relational_scala.tables
+package relational.tables
 
-import org.mauricioszabo.relational_scala._
-import org.mauricioszabo.relational_scala.attributes.Attribute
-import org.mauricioszabo.relational_scala._
+import relational._
+import relational.attributes.Attribute
+import relational._
 
 class Alias(name: String, query: String, attributes: Seq[Any]) extends TableLike {
   def as(name: String) = new Alias(name, query, attributes)

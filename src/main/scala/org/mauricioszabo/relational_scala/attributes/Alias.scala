@@ -1,6 +1,6 @@
-package org.mauricioszabo.relational_scala.attributes
+package relational.attributes
 
-import org.mauricioszabo.relational_scala._
+import relational._
 
 class Alias(name: String, query: String, attributes: Seq[Any]) extends AttributeLike {
   override def as(name: String) = new Alias(name, query, attributes)

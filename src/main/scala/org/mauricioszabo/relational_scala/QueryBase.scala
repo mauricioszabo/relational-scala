@@ -1,6 +1,6 @@
-package org.mauricioszabo.relational_scala
-import org.mauricioszabo.relational_scala.comparissions.Comparission
-import org.mauricioszabo.relational_scala.clauses.Select
+package relational
+import relational.comparissions.Comparission
+import relational.clauses.Select
 
 trait QueryBase[A] {
   private var relationalTable: tables.TableLike = {

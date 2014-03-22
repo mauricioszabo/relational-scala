@@ -1,4 +1,4 @@
-package org.mauricioszabo.relational_scala.orm.config
+package relational.orm.config
 
 object Connection {
   var getConnection: () => java.sql.Connection = { null }

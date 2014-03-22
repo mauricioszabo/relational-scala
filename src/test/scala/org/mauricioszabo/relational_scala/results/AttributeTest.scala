@@ -3,7 +3,7 @@ package tests.results
 import org.scalatest._
 import org.scalatest.matchers.ShouldMatchers
 
-import org.mauricioszabo.relational_scala.results._
+import relational.results._
 
 class AttributeTest extends WordSpec with ShouldMatchers {
   val string = new Attribute("10.1")

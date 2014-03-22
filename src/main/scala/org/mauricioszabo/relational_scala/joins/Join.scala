@@ -1,6 +1,6 @@
-package org.mauricioszabo.relational_scala.joins
+package relational.joins
 
-import org.mauricioszabo.relational_scala._
+import relational._
 
 trait Join extends Partial {
   protected def newPartial(table: tables.TableLike, comparission: comparissions.Comparission, text: String) = {

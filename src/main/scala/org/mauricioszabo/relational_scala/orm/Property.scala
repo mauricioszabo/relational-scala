@@ -1,7 +1,7 @@
-package org.mauricioszabo.relational_scala.orm
+package relational.orm
 
 class Property[A] {
-  import org.mauricioszabo.relational_scala.results.Attribute._
+  import relational.results.Attribute._
 
   private var default: A = _
   protected[orm] var possibleValue: () => Option[A] = { () => None }

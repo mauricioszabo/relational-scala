@@ -1,7 +1,7 @@
-package org.mauricioszabo.relational_scala.orm
+package relational.orm
 
 import scala.language.implicitConversions
-import org.mauricioszabo.relational_scala.results.{Attribute => Attr}
+import relational.results.{Attribute => Attr}
 import scala.reflect.ClassTag
 import scala.language.higherKinds
 

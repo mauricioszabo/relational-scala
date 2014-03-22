@@ -1,6 +1,6 @@
-package org.mauricioszabo.relational_scala.attributes
+package relational.attributes
 
-import org.mauricioszabo.relational_scala.PartialStatement
+import relational.PartialStatement
 
 class All extends AttributeLike {
   lazy val partial = new PartialStatement("*", Nil)

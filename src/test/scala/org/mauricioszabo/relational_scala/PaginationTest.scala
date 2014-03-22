@@ -1,5 +1,5 @@
 import org.scalatest._
-import org.mauricioszabo.relational_scala._
+import relational._
 
 class PaginationTest extends WordSpec with matchers.ShouldMatchers {
 

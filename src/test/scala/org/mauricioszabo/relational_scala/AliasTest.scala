@@ -1,5 +1,5 @@
 import org.scalatest._
-import org.mauricioszabo.relational_scala._
+import relational._
 
 class AliasTest extends WordSpec with matchers.ShouldMatchers {
   val people = new tables.Table("people")

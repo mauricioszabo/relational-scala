@@ -2,8 +2,8 @@ package tests.orm
 
 import org.scalatest._
 
-import org.mauricioszabo.relational_scala.orm._
-import org.mauricioszabo.relational_scala.orm.mapper.LazyResultSet
+import relational.orm._
+import relational.orm.mapper.LazyResultSet
 
 class Person extends Mapping {
   val name = attr.name.as[Property, String]

@@ -1,6 +1,6 @@
-package org.mauricioszabo.relational_scala.comparissions
+package relational.comparissions
 
-import org.mauricioszabo.relational_scala.PartialStatement
+import relational.PartialStatement
 
 object None extends Comparission {
   override protected def present = false

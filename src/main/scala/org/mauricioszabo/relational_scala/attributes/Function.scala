@@ -1,7 +1,7 @@
-package org.mauricioszabo.relational_scala.attributes
+package relational.attributes
 
-import org.mauricioszabo.relational_scala.comparissions._
-import org.mauricioszabo.relational_scala.PartialStatement
+import relational.comparissions._
+import relational.PartialStatement
 
 class Function(function: String, attribute: AttributeLike*) extends Comparable {
   lazy val partial = {

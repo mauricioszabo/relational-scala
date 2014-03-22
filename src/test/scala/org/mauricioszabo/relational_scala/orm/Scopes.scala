@@ -2,10 +2,10 @@ package tests.orm
 
 import org.scalatest._
 
-import org.mauricioszabo.relational_scala.comparissions.Comparission
-import org.mauricioszabo.relational_scala.orm._
-import org.mauricioszabo.relational_scala.orm.mapper.LazyResultSet
-import org.mauricioszabo.relational_scala.comparissions.Comparission
+import relational.comparissions.Comparission
+import relational.orm._
+import relational.orm.mapper.LazyResultSet
+import relational.comparissions.Comparission
 
 class OtherPerson extends Mapping {
   val name = attr.name.as[Property, String]

@@ -1,6 +1,6 @@
-package org.mauricioszabo.relational_scala.clauses
+package relational.clauses
 
-import org.mauricioszabo.relational_scala._
+import relational._
 
 class Select(distinct: Boolean, table: tables.TableLike, listOfAttributes: Any*)
     extends Seq[attributes.AttributeLike] with Partial {

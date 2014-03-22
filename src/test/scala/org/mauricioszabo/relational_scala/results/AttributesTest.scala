@@ -3,7 +3,7 @@ package tests.results
 import org.scalatest._
 import org.scalatest.matchers.ShouldMatchers
 
-import org.mauricioszabo.relational_scala.results._
+import relational.results._
 
 class AttributesTest extends WordSpec with ShouldMatchers {
   lazy val row = new Attributes(Map('id -> Attribute(1), 'name -> Attribute("Foo")))

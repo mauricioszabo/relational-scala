@@ -1,6 +1,6 @@
-package org.mauricioszabo.relational_scala.tables
+package relational.tables
 
-import org.mauricioszabo.relational_scala._
+import relational._
 
 class Table(name: String) extends TableLike {
   lazy val partial = new PartialStatement(representation, Nil)

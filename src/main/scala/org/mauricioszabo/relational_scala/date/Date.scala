@@ -1,4 +1,4 @@
-package org.mauricioszabo.relational_scala.date
+package relational.date
 
 import java.util.{Calendar => C, GregorianCalendar => GC, TimeZone => TZ}
 import scala.math.ScalaNumericAnyConversions

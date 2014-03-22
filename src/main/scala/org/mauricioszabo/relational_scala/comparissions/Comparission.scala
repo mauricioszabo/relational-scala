@@ -1,7 +1,7 @@
-package org.mauricioszabo.relational_scala.comparissions
+package relational.comparissions
 
-import org.mauricioszabo.relational_scala._
-import org.mauricioszabo.relational_scala.comparissions._
+import relational._
+import relational.comparissions._
 
 trait Comparission extends attributes.Comparable {
   protected def present = true

@@ -1,7 +1,7 @@
-package org.mauricioszabo.relational_scala
+package relational
 
-import org.mauricioszabo.relational_scala._
-import org.mauricioszabo.relational_scala.results._
+import relational._
+import relational.results._
 
 case class Selector(
     select: clauses.Select,

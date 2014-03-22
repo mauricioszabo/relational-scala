@@ -1,4 +1,4 @@
-package org.mauricioszabo.relational_scala.results
+package relational.results
 import scala.language.implicitConversions
 
 class Attribute(val obj: Any) {

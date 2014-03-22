@@ -1,6 +1,6 @@
-package org.mauricioszabo.relational_scala.orders
+package relational.orders
 
-import org.mauricioszabo.relational_scala._
+import relational._
 
 case class Descending(something: Partial) extends Partial {
   lazy val partial = {

@@ -1,4 +1,4 @@
-package org.mauricioszabo.relational_scala.orm.mapper
+package relational.orm.mapper
 
 class Scopes {
   //val definition = new {

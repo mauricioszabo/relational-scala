@@ -1,6 +1,6 @@
-package org.mauricioszabo.relational_scala.orm
+package relational.orm
 
-import org.mauricioszabo.relational_scala.orm.config.I18n
+import relational.orm.config.I18n
 
 class MaybeValid {
 }

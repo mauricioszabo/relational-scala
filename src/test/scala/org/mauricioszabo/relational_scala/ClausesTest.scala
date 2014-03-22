@@ -3,8 +3,8 @@ package tests
 import org.scalatest._
 import org.scalatest.matchers.ShouldMatchers
 
-import org.mauricioszabo.relational_scala.tables
-import org.mauricioszabo.relational_scala.clauses._
+import relational.tables
+import relational.clauses._
 
 class ClausesTest extends WordSpec with ShouldMatchers with DatabaseSetup {
   val table = new tables.Table("foo")

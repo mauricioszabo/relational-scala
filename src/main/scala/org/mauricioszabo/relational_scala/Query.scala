@@ -1,7 +1,7 @@
-package org.mauricioszabo.relational_scala
+package relational
 
 import scala.language.implicitConversions
-import org.mauricioszabo.relational_scala.clauses.Select
+import relational.clauses.Select
 
 trait Query extends QueryBase[Selector with Query] {
   private def toSelector: Selector with Query = this match {

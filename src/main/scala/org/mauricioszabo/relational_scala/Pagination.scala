@@ -1,4 +1,4 @@
-package org.mauricioszabo.relational_scala
+package relational
 
 class Pagination(query: String, attributes: Seq[Any],
     offset: Int = -1, limit: Int = -1) extends Partial {

@@ -1,6 +1,6 @@
-package org.mauricioszabo.relational_scala.attributes
+package relational.attributes
 
-import org.mauricioszabo.relational_scala.comparissions._
+import relational.comparissions._
 
 trait Comparable extends AttributeLike {
   def ==(other: => Any ) = new Equality("=", this, other)

@@ -1,8 +1,8 @@
-package org.mauricioszabo.relational_scala.orm.mapper
+package relational.orm.mapper
 
-import org.mauricioszabo.relational_scala._
-import org.mauricioszabo.relational_scala.results.Attributes
-import org.mauricioszabo.relational_scala.Partial
+import relational._
+import relational.results.Attributes
+import relational.Partial
 
 trait LazyResultSet[A] extends Selector
     with ScopeFinder[LazyResultSet[A]]

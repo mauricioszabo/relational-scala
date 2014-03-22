@@ -1,7 +1,7 @@
-package org.mauricioszabo.relational_scala.joins
+package relational.joins
 
-import org.mauricioszabo.relational_scala.tables.TableLike
-import org.mauricioszabo.relational_scala._
+import relational.tables.TableLike
+import relational._
 
 class JoinHelper[A](query: QueryBase[A], otherTable: TableLike, joinKind: Symbol) {
   def on(fn: (TableLike, TableLike) => comparissions.Comparission): A = {

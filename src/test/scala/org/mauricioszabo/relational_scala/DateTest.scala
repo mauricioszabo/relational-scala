@@ -1,5 +1,5 @@
 import org.scalatest._
-import org.mauricioszabo.relational_scala.date._
+import relational.date._
 
 class DateTest extends WordSpec with matchers.ShouldMatchers {
   val oneHour = 1 * 1000 * 60 * 60

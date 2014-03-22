@@ -1,6 +1,6 @@
-package org.mauricioszabo.relational_scala
+package relational
 
-import org.mauricioszabo.relational_scala.orders._
+import relational.orders._
 
 trait Partial {
   def partial: PartialStatement

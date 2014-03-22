@@ -1,4 +1,4 @@
-package org.mauricioszabo.relational_scala
+package relational
 
 protected object Random {
   def generate(size: Int) = {

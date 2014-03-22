@@ -1,6 +1,6 @@
-package org.mauricioszabo.relational_scala.attributes
+package relational.attributes
 
-import org.mauricioszabo.relational_scala._
+import relational._
 
 trait AttributeLike extends Partial {
   def as: Alias = as(Random.generate(5))

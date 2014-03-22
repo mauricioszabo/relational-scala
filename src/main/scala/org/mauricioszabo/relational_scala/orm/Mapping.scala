@@ -1,10 +1,10 @@
-package org.mauricioszabo.relational_scala.orm
+package relational.orm
 
-import org.mauricioszabo.relational_scala.results.{Attribute => RAttribute}
-import org.mauricioszabo.relational_scala.results.Attributes
+import relational.results.{Attribute => RAttribute}
+import relational.results.Attributes
 import scala.language.implicitConversions
 import scala.language.dynamics
-import org.mauricioszabo.relational_scala.Selector
+import relational.Selector
 
 class DynamicAttr(a: => Attributes) extends Dynamic {
   def selectDynamic(key: String) = new Attribute(a.attribute get Symbol(key))

@@ -1,6 +1,6 @@
-package org.mauricioszabo.relational_scala.orm.mapper
+package relational.orm.mapper
 
-import org.mauricioszabo.relational_scala._
+import relational._
 
 // Simple trait to comply with the Selector's API.
 trait SelectorCompliance {

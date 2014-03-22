@@ -1,4 +1,4 @@
-package org.mauricioszabo.relational_scala.orm
+package relational.orm
 
 class Validated[A] extends Property[A] {
   private var validOnlyIf = { a: Property[A] => true }

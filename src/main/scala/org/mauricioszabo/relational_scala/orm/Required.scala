@@ -1,4 +1,4 @@
-package org.mauricioszabo.relational_scala.orm
+package relational.orm
 
 class Required[A] extends Property[A] {
   override protected def validate = optionValue match {

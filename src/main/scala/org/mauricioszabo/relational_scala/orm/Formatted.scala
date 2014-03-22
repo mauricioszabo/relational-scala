@@ -1,4 +1,4 @@
-package org.mauricioszabo.relational_scala.orm
+package relational.orm
 
 import scala.util.matching.Regex
 

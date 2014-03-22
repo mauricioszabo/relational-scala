@@ -1,7 +1,7 @@
-package org.mauricioszabo.relational_scala.orm.mapper
+package relational.orm.mapper
 
-import org.mauricioszabo.relational_scala.QueryBase
-import org.mauricioszabo.relational_scala.Selector
+import relational.QueryBase
+import relational.Selector
 
 trait ScopeDefinition[A] {
   type Q = QueryBase[A] with SelectorCompliance

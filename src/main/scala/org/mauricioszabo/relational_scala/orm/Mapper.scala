@@ -1,11 +1,11 @@
-package org.mauricioszabo.relational_scala.orm
+package relational.orm
 
-import org.mauricioszabo.relational_scala._
+import relational._
 import scala.reflect.ClassTag
 import java.lang.reflect.Field
-import org.mauricioszabo.relational_scala.results.Attributes
-import org.mauricioszabo.relational_scala.orm.mapper.LazyResultSet
-import org.mauricioszabo.relational_scala.clauses.Select
+import relational.results.Attributes
+import relational.orm.mapper.LazyResultSet
+import relational.clauses.Select
 
 class Mapper[A](implicit val tag: ClassTag[A])
     extends QueryBase[LazyResultSet[A]]

@@ -1,7 +1,7 @@
-package org.mauricioszabo.relational_scala.comparissions
+package relational.comparissions
 
-import org.mauricioszabo.relational_scala.attributes._
-import org.mauricioszabo.relational_scala.PartialStatement
+import relational.attributes._
+import relational.PartialStatement
 
 class In(attribute: AttributeLike, list: Seq[Any]) extends Comparission {
   lazy val partial = {

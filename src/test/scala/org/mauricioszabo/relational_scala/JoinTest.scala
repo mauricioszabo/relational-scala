@@ -1,6 +1,6 @@
 import org.scalatest._
-import org.mauricioszabo.relational_scala._
-import org.mauricioszabo.relational_scala.joins._
+import relational._
+import relational.joins._
 
 class JoinTest extends FlatSpec with matchers.ShouldMatchers {
   val people = new tables.Table("people")

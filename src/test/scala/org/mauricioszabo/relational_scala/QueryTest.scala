@@ -3,7 +3,7 @@ package tests
 import org.scalatest._
 import org.scalatest.matchers.ShouldMatchers
 
-import org.mauricioszabo.relational_scala._
+import relational._
 
 class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
   object People extends Query {

@@ -1,6 +1,6 @@
-package org.mauricioszabo.relational_scala.orm
+package relational.orm
 
-import org.mauricioszabo.relational_scala.orm.mapper.LazyResultSet
+import relational.orm.mapper.LazyResultSet
 import scala.language.higherKinds
 
 trait AssociationDefinition {
@@ -8,9 +8,9 @@ trait AssociationDefinition {
 }
 
 class AssociationDefinerHelper[B <: Association[A], A] {
-  def query(query: Selector => LazyResultSet[A]) = {
+  //def query(query: Selector => LazyResultSet[A]) = {
 
-  }
+  //}
 }
 
 trait Association[A] {

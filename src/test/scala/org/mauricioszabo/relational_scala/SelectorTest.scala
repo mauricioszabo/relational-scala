@@ -3,8 +3,8 @@ package tests
 import org.scalatest._
 import org.scalatest.matchers.ShouldMatchers
 
-import org.mauricioszabo.relational_scala._
-import org.mauricioszabo.relational_scala.clauses.Select
+import relational._
+import relational.clauses.Select
 
 class SelectorTest extends WordSpec with DatabaseSetup with ShouldMatchers {
   val people = new tables.Table("scala_people")

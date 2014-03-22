@@ -3,7 +3,7 @@ package tests
 import org.scalatest.WordSpec
 import org.scalatest.matchers.ShouldMatchers
 
-import org.mauricioszabo.relational_scala._
+import relational._
 
 class AttributeTest extends WordSpec with ShouldMatchers {
   lazy val table = new tables.Table("examples")

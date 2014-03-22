@@ -1,6 +1,6 @@
-package org.mauricioszabo.relational_scala.comparissions
+package relational.comparissions
 
-import org.mauricioszabo.relational_scala.PartialStatement
+import relational.PartialStatement
 
 class Not(comparission: Comparission) extends Comparission {
   lazy val partial = new PartialStatement("NOT(" + statement.query + ")", statement.attributes)

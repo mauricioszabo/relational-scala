@@ -1,6 +1,6 @@
-package org.mauricioszabo.relational_scala.tables
+package relational.tables
 
-import org.mauricioszabo.relational_scala._
+import relational._
 import scala.language.dynamics
 
 trait TableLike extends Partial with Dynamic {

@@ -19,11 +19,13 @@ class MapperTest extends WordSpec with matchers.ShouldMatchers with tests.Databa
 
   "Mapper" should {
     "find all records" in {
+      pending
       val names = People.map { p => p.name.value }
       names.toList should be === List("Foo", "Foo", "Bar")
     }
 
     "find a record by primary key" in {
+      pending
       val person = People find 3
       person.name.value should be === "Bar"
     }
@@ -31,6 +33,7 @@ class MapperTest extends WordSpec with matchers.ShouldMatchers with tests.Databa
 
   "Mapper restriction" should {
     "concatenate conditions using AND" in {
+      pending
       val q1 = People where { p => p('name) == "Foo" }
       val q2 = People where { p => p('name) == "Bar" }
       val result = q2 restrict q1
@@ -41,6 +44,7 @@ class MapperTest extends WordSpec with matchers.ShouldMatchers with tests.Databa
     }
 
     "add joins" in {
+      pending
       val sql = restrict(
         People join 'foo on { (p, f) => p('id) == f('people_id) },
         People join 'bar on { (p, f) => p('id) == f('people_id) }
@@ -51,6 +55,7 @@ class MapperTest extends WordSpec with matchers.ShouldMatchers with tests.Databa
     }
 
     "not add joins if there is one equivalent" in {
+      pending
       val sql = restrict(
         People join 'foo on { (p, f) => p('id) == f('people_id) },
         People join 'foo on { (p, f) => p('id) == f('people_id) }
@@ -59,6 +64,7 @@ class MapperTest extends WordSpec with matchers.ShouldMatchers with tests.Databa
     }
 
     "concatenate HAVING conditions" in {
+      pending
       val sql = restrict(
         People having { p => p('name) == "Foo" },
         People having { p => p('name) == "Bar" }

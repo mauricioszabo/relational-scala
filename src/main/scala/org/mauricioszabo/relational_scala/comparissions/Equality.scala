@@ -6,19 +6,10 @@ import relational.PartialStatement
 class Equality(
   protected val comparission: String,
   protected val attribute: AttributeLike,
-  protected val other: Any) extends Comparission {
+  protected val other: AttributeLike) extends Comparission {
 
-  lazy val partial = other match {
-    case a: AttributeLike => new PartialStatement(query + a.partial.query, ap.attributes ++ a.partial.attributes)
-    case null => handleNull
-    case _ => new PartialStatement(query + "?", List(other) ++ ap.attributes)
-  }
-
-  private def handleNull = comparission match {
-    case "=" => new PartialStatement(ap.query + " IS NULL", ap.attributes)
-    case "<>" => new PartialStatement(ap.query + " IS NOT NULL", ap.attributes)
-    case _ => new PartialStatement(ap.query + " " + comparission + " NULL", ap.attributes)
-  }
+  lazy val partial = new PartialStatement(query + other.partial.query,
+    ap.attributes ++ other.partial.attributes)
 
   private lazy val query = ap.query + " " + comparission + " "
   private lazy val ap = attribute.partial

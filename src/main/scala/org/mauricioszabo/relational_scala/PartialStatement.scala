@@ -13,6 +13,7 @@ case class PartialStatement(query: String, attributes: Seq[Any]) {
     case str: String => "'" + str.replaceAll("'", "''") + "'"
     //case date: Date => "'" + date.toString + "'"
     //case time: Time => "'" + time.utc + "'"
+    case null => "NULL"
     case _ => attribute.toString
   }
 

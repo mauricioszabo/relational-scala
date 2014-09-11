@@ -30,11 +30,13 @@ class Scopes extends WordSpec with matchers.ShouldMatchers with tests.DatabaseSe
 
   "Scoped search" should {
     "find with a scope" in {
+      pending
       val p = People.find('seventeen).map(_.age.value)
       p.toList should be === List(17, 17)
     }
 
     "find with two scopes" in {
+      pending
       val p = People.find('seventeen).find('orFoo).map(_.age.value)
       p.toList should be === List(17)
     }

@@ -1,4 +1,4 @@
-package test
+package test.relational
 
 import org.scalatest._
 import relational._

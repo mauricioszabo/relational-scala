@@ -28,6 +28,7 @@ class Association extends WordSpec with matchers.ShouldMatchers with tests.Datab
 
   "Many associations" should {
     "retrieve the records by SQL" in {
+      pending
       val p = People.find(1)
     }
   }

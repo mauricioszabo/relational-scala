@@ -1,19 +1,12 @@
 package relational.attributes
 
 import relational.comparissions._
-import relational.PartialStatement
+import relational.{PartialStatement, Partial, Adapter}
 
-class Function(function: String, attribute: AttributeLike*) extends Comparable {
+class Function(name: Symbol, self: Partial, params: Partial*) extends Comparable {
   lazy val partial = {
-    var queries: List[String] = Nil
-    var attributes: Seq[Any] = Nil
-    val partials = attribute.map { e =>
-      val p = e.partial
-      queries = queries :+ p.query
-      attributes = attributes ++ p.attributes
-    }
-
-    val query = function + "(" + queries.mkString(", ") + ")"
+    val function = Adapter.getFunction(name)
+    val(query, attributes) = function(self, params)
     new PartialStatement(query, attributes)
   }
 }

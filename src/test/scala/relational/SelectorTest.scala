@@ -9,19 +9,15 @@ import relational.clauses.Select
 class SelectorTest extends WordSpec with DatabaseSetup with ShouldMatchers {
   val people = new tables.Table("scala_people")
 
-  //import scala.reflect.runtime.universe._
-  //def foo[A](a: A)(implicit tag: TypeTag[A]) = tag.tpe
-  //typeOf[Something].members.filter(m => m.isTerm && (m.asTerm.isVal || m.asTerm.isVar))
-
   "Selector" should {
     val select = Select.select(people, people.*)
     val selector = Selector(from=List(people), select=select)
 
     "create a SQL" in {
-      selector.partial.toPseudoSQL should be === "SELECT scala_people.* FROM scala_people"
+      selector.partial.toPseudoSQL should be === "SELECT \"scala_people\".* FROM \"scala_people\""
 
       val selector2 = selector.copy(where=(people("id") == 10))
-      selector2.partial.toPseudoSQL should be === "SELECT scala_people.* FROM scala_people WHERE scala_people.id = 10"
+      selector2.partial.toPseudoSQL should be === "SELECT \"scala_people\".* FROM \"scala_people\" WHERE \"scala_people\".\"id\" = 10"
     }
 
     "search for records in a database" in {
@@ -48,7 +44,7 @@ class SelectorTest extends WordSpec with DatabaseSetup with ShouldMatchers {
     "With pagination" should {
       "paginate the results" in {
         val s = selector.copy(limit=1, offset=2)
-        s.partial.toPseudoSQL should be === "SELECT scala_people.* FROM scala_people LIMIT 1 OFFSET 2"
+        s.partial.toPseudoSQL should be === "SELECT \"scala_people\".* FROM \"scala_people\" LIMIT 1 OFFSET 2"
       }
     }
 

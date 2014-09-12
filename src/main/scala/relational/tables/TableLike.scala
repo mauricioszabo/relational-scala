@@ -13,7 +13,7 @@ trait TableLike extends Partial with Dynamic {
   def apply(attribute: Symbol): attributes.Attribute = this(attribute.name)
   def apply(attribute: String): attributes.Attribute
 
-  def * = new attributes.Attribute(this, "*")
+  def * = new attributes.AllInTable(this)
 
   override def toString = getClass.getName + "("+representation+")"
 }

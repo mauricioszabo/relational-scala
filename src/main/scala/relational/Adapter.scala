@@ -17,6 +17,8 @@ object Adapter {
     attributes.ConfigFunctions
   }
 
+  def currentDriver = driver
+
   def defineFunctionN(name: Symbol, strings: (Symbol, String)*) {
     val functions = strings.map { case(driver, string) =>
       val function = { (self: Partial, params: Seq[Partial]) =>

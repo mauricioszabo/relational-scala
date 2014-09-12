@@ -12,12 +12,12 @@ class ClausesTest extends WordSpec with ShouldMatchers with DatabaseSetup {
   "Select" should {
     "create a SELECT clause" in {
       val select = new Select(false, table, 'one, 'two)
-      select.partial.toPseudoSQL should be === "SELECT foo.one, foo.two"
+      select.partial.toPseudoSQL should be === "SELECT \"foo\".\"one\", \"foo\".\"two\""
     }
 
     "create a SELECT DISTINCT clause" in {
       val select = new Select(true, table, 'one, 'two)
-      select.partial.toPseudoSQL should be === "SELECT DISTINCT foo.one, foo.two"
+      select.partial.toPseudoSQL should be === "SELECT DISTINCT \"foo\".\"one\", \"foo\".\"two\""
     }
   }
 
@@ -25,7 +25,7 @@ class ClausesTest extends WordSpec with ShouldMatchers with DatabaseSetup {
     "join with another" in {
       val comp = table('id) == 10
       val select = new Select(false, table, 'one)
-      select.appendPartial(comp).partial.toPseudoSQL should be === "SELECT foo.one foo.id = 10"
+      select.appendPartial(comp).partial.toPseudoSQL should be === "SELECT \"foo\".\"one\" \"foo\".\"id\" = 10"
     }
   }
 }

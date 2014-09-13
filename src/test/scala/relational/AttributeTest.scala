@@ -1,11 +1,13 @@
 package test.relational
 
-import org.scalatest.WordSpec
+import org.scalatest._
 
 import relational._
 import relational.{attributes => attrs}
 
-class AttributeTest extends WordSpec with AdapterSetup {
+class AttributeTest extends WordSpec with matchers.ShouldMatchers {
+  implicit val adapter = new Adapter
+  adapter configure 'all
   lazy val table = new tables.Table("examples")
   lazy val name = new attrs.Attribute(table, "name")
   lazy val id = table('id)

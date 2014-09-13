@@ -8,8 +8,9 @@ class Select(distinct: Boolean, table: tables.TableLike, listOfAttributes: Any*)
   def iterator = attributeList.iterator
   def apply(idx: Int) = attributeList(idx)
   def length = listOfAttributes.length
+  val isDistinct = distinct
 
-  lazy val attributeList = convert(listOfAttributes.toList)
+  lazy val attributeList = convert(listOfAttributes.toList).toVector
 
   lazy val partial = {
     val nil = Seq[Any]()
@@ -28,6 +29,8 @@ class Select(distinct: Boolean, table: tables.TableLike, listOfAttributes: Any*)
   private def convert(list: List[Any]): List[attributes.AttributeLike] = list match {
     case Nil => Nil
     case head::tail => head match {
+      case '* => (table.*)::convert(tail)
+      case "*" => (table.*)::convert(tail)
       case s: Symbol => table(s)::convert(tail)
       case s: String => table(s)::convert(tail)
       case a: attributes.AttributeLike => a::convert(tail)

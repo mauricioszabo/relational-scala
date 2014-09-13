@@ -2,7 +2,7 @@ package relational.comparissions
 
 import relational.PartialStatement
 
-class Or(protected val comparissions: List[Comparission]) extends Comparission {
+case class Or(protected val comparissions: List[Comparission]) extends Comparission {
   lazy val partial = {
     val partials = comparissions.view.map { _.partial }
     val query = "(" + partials.map { p => p.query }.mkString(" OR ") + ")"

@@ -3,7 +3,7 @@ package relational.comparissions
 import relational.attributes._
 import relational.PartialStatement
 
-class Equality(
+case class Equality(
   protected val comparission: String,
   protected val attribute: AttributeLike,
   protected val other: AttributeLike) extends Comparission {

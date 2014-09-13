@@ -5,6 +5,7 @@ import relational._
 //import relational.joins._
 
 class Equals extends WordSpec with matchers.ShouldMatchers {
+  val examples = new tables.Table("examples")
   "Partials" should {
     "calculate equivalences with Tables" in {
       val t1 = new tables.Table("examples")
@@ -14,16 +15,16 @@ class Equals extends WordSpec with matchers.ShouldMatchers {
     }
 
     "calculate equivalences with attributes" in {
-      val n1 = new tables.Table("examples")('name)
-      val n2 = new tables.Table("examples")('name)
+      val n1 = examples('name)
+      val n2 = examples('name)
 
       (n1 equivalentTo n2) should be (true)
     }
 
     "calculate equivalences with simple comparissions" in {
-      val n1 = new tables.Table("examples")('name) == "Foo"
-      val n2 = new tables.Table("examples")('name) == "Foo"
-      val n3 = new tables.Table("examples")('name) == "Bar"
+      val n1 = examples('name) == "Foo"
+      val n2 = examples('name) == "Foo"
+      val n3 = examples('name) == "Bar"
 
       (n1 equivalentTo n2) should be (true)
       (n1 equivalentTo n3) should be (false)
@@ -31,8 +32,8 @@ class Equals extends WordSpec with matchers.ShouldMatchers {
   }
 
   "Comparission's equivalences" should {
-    val c1 = new tables.Table("examples")('name) == "Foo"
-    val c2 = new tables.Table("examples")('name) == "Bar"
+    val c1 = examples('name) == "Foo"
+    val c2 = examples('name) == "Bar"
 
     "ignore order of OR" in {
       pending

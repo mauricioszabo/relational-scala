@@ -10,6 +10,11 @@ class ClausesTest extends WordSpec with ShouldMatchers with DatabaseSetup {
   val table = new tables.Table("foo")
 
   "Select" should {
+    "create a SELECT * clause" in {
+      val select = new Select(false, table, '*)
+      select.partial.toPseudoSQL should be === "SELECT \"foo\".*"
+    }
+
     "create a SELECT clause" in {
       val select = new Select(false, table, 'one, 'two)
       select.partial.toPseudoSQL should be === "SELECT \"foo\".\"one\", \"foo\".\"two\""

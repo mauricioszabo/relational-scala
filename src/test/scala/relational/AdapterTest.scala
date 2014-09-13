@@ -5,10 +5,10 @@ import relational.{attributes => attrs}
 import relational._
 
 class AdapterTest extends WordSpec with matchers.ShouldMatchers with BeforeAndAfterEach {
-  Adapter.configure('all)
+  implicit val adapter = new Adapter
+  adapter.configure('all)
 
   lazy val table = new tables.Table("examples")
-  //lazy name = new attributes.Attribute(table, "name")
 
   class Test extends attrs.Attribute(table, "name") {
     def foobar(param: Any) =
@@ -17,6 +17,7 @@ class AdapterTest extends WordSpec with matchers.ShouldMatchers with BeforeAndAf
     def foobar2(p1: Any, p2: Any) =
       new attrs.Function('foobar2, this, attrs.Attribute.wrap(p1), attrs.Attribute.wrap(p2))
   }
+
   lazy val name = new Test
 
   "Adapter" should {
@@ -44,15 +45,11 @@ class AdapterTest extends WordSpec with matchers.ShouldMatchers with BeforeAndAf
     "create a method that has different behaviour for each adapter" in {
       Adapter.defineFunctionN('foobar, 'all -> "$0 FOO($1)", 'oracle -> "$0 BAR($1)")
 
-      Adapter configure 'mysql
+      adapter configure 'mysql
       name.foobar(10).partial.toPseudoSQL should be === "\"examples\".\"name\" FOO(10)"
 
-      Adapter configure 'oracle
+      adapter configure 'oracle
       name.foobar(10).partial.toPseudoSQL should be === "\"examples\".\"name\" BAR(10)"
     }
-  }
-
-  override def afterEach {
-    Adapter configure 'all
   }
 }

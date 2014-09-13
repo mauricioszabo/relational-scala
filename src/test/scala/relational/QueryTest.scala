@@ -82,8 +82,8 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
         Addresses where { a => a('id) == primaryQuery.table('id) } select 'address
       }
 
-      r.partial.toPseudoSQL should be === ("SELECT scala_people.* FROM scala_people ORDER BY " +
-        "(SELECT scala_addresses.address FROM scala_addresses WHERE scala_addresses.id = scala_people.id)")
+      r.partial.toPseudoSQL should be === ("SELECT \"scala_people\".* FROM \"scala_people\" ORDER BY " +
+        "(SELECT \"scala_addresses\".\"address\" FROM \"scala_addresses\" WHERE \"scala_addresses\".\"id\" = \"scala_people\".\"id\")")
     }
   }
 
@@ -113,9 +113,9 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
       }
 
       result.partial.toPseudoSQL should be === (
-        "SELECT sql.id FROM (SELECT * FROM scala_people ORDER BY (scala_people.id) DESC) sql " +
-        "INNER JOIN scala_addresses ON sql.id = scala_addresses.person_id " +
-        "ORDER BY sql.name"
+        "SELECT \"sql\".\"id\" FROM (SELECT * FROM \"scala_people\" ORDER BY (\"scala_people\".\"id\") DESC) sql " +
+        "INNER JOIN \"scala_addresses\" ON \"sql\".\"id\" = \"scala_addresses\".\"person_id\" " +
+        "ORDER BY \"sql\".\"name\""
       )
     }
   }

@@ -2,15 +2,11 @@ package relational
 
 import scala.collection.mutable.{Map, SynchronizedMap, HashMap}
 
-object Adapter {
-  type Function = (Partial, Seq[Partial]) => (String, Seq[Any])
-  type ListOfFunctions = (Symbol, Function)
+class Adapter(d: Symbol) {
+  val DEFAULT_DRIVER = 'all
+  private var driver = d
 
-  type HashMapType = HashMap[Symbol, Function] with SynchronizedMap[Symbol, Function]
-  val functions = new HashMap[Symbol, HashMapType] with SynchronizedMap[Symbol, HashMapType]
-
-  private val DEFAULT_DRIVER = 'all
-  private var driver = DEFAULT_DRIVER
+  def this() = this('all)
 
   def configure(driver: Symbol = DEFAULT_DRIVER) {
     this.driver = driver
@@ -18,6 +14,20 @@ object Adapter {
   }
 
   def currentDriver = driver
+
+  def getFunction(name: Symbol) =
+    Adapter.getFunctionForDriver(driver, name)
+}
+
+object Adapter extends Adapter {
+  implicit val default = {
+    this
+  }
+
+  type Function = (Partial, Seq[Partial]) => (String, Seq[Any])
+  type ListOfFunctions = (Symbol, Function)
+  type HashMapType = HashMap[Symbol, Function] with SynchronizedMap[Symbol, Function]
+  private val functions = new HashMap[Symbol, HashMapType] with SynchronizedMap[Symbol, HashMapType]
 
   def defineFunctionN(name: Symbol, strings: (Symbol, String)*) {
     val functions = strings.map { case(driver, string) =>
@@ -41,7 +51,7 @@ object Adapter {
 
   def defineFunction(name: Symbol, functions: ListOfFunctions*) {
     functions.foreach { case(driver, body) =>
-      Adapter.addCustomFunction(name, driver, body)
+      addCustomFunction(name, driver, body)
     }
   }
 
@@ -50,9 +60,7 @@ object Adapter {
     entry(name) = function
   }
 
-  def getFunction(name: Symbol): Function = getFunctionForDriver(driver, name)
-
-  private def getFunctionForDriver(driver: Symbol, name: Symbol): Function = {
+  protected def getFunctionForDriver(driver: Symbol, name: Symbol): Function = {
     getDriverEntry(driver) get name match {
       case Some(function) => function
       case None if(driver == DEFAULT_DRIVER) => { (p: Partial, a: Seq[Partial]) => ("", Nil) }

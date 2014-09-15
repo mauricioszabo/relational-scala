@@ -3,6 +3,9 @@ package relational.joins
 import relational._
 
 trait Join extends Partial {
+  def table: tables.TableLike
+  def condition: comparissions.Comparission
+
   protected def newPartial(table: tables.TableLike, comparission: comparissions.Comparission, text: String) = {
     val tablePartial = table.partial
     val condPartial = comparission.partial

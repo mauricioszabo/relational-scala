@@ -2,7 +2,7 @@ package relational.attributes
 
 import relational._
 
-class Attribute(val table: tables.TableLike, protected val name: String)
+case class Attribute(val table: tables.TableLike, val name: String)
                (implicit adapter: Adapter) extends Comparable {
   lazy val partial = new PartialStatement(table.representation + "." + Escape(name), Nil)
 }

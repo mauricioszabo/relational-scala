@@ -3,7 +3,7 @@ package relational.tables
 import relational._
 import relational.attributes.Escape
 
-class Table(name: String)(implicit adapter: Adapter) extends TableLike {
+case class Table(private val name: String)(implicit adapter: Adapter) extends TableLike {
   lazy val partial = new PartialStatement(representation, Nil)
   def representation = Escape(name)
   def apply(attribute: String) = new attributes.Attribute(this, attribute)

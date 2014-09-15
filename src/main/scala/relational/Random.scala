@@ -1,7 +1,7 @@
 package relational
 
 protected object Random {
-  def generate(size: Int) = {
+  def generate(size: Int) = synchronized {
     val number = "[0-9]".r
     val random = scala.util.Random
     var string = ""

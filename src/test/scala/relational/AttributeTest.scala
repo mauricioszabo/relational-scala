@@ -82,6 +82,12 @@ class AttributeTest extends WordSpec with matchers.ShouldMatchers {
       val c2 = (id == 10)
       pseudoSQL(c1 || c2) should be === "(\"examples\".\"name\" = 'Foo' OR \"examples\".\"id\" = 10)"
       pseudoSQL(c1 && c2) should be === "(\"examples\".\"name\" = 'Foo' AND \"examples\".\"id\" = 10)"
+
+      val c3 = (name == "Bar")
+      pseudoSQL(c1 || c2 || c3) should be ===
+        """("examples"."name" = 'Foo' OR "examples"."id" = 10 OR "examples"."name" = 'Bar')"""
+      pseudoSQL(c1 && c2 && c3) should be ===
+        """("examples"."name" = 'Foo' AND "examples"."id" = 10 AND "examples"."name" = 'Bar')"""
     }
 
     "support SUM, AVERAGE, MAX, MIN, COUNT" in {

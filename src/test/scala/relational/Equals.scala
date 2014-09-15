@@ -42,4 +42,12 @@ class Equals extends WordSpec with matchers.ShouldMatchers {
       (o1 equivalentTo o2) should be (true)
     }
   }
+
+  "Comparissions by equalities (default)" should {
+    "compare tables" in {
+      val t1 = new tables.Table("foo")
+      val t2 = new tables.Table("foo")
+      (t1 == t2) should be === true
+    }
+  }
 }

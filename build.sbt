@@ -2,6 +2,8 @@ scalaVersion := "2.10.2"
 
 scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
 
+scalacOptions in (Compile,doc) ++= Seq("-diagrams", "-implicits")
+
 libraryDependencies ++= Seq(
   "org.scala-lang" % "scala-reflect" % "2.10.2",
   "org.scalatest" %% "scalatest" % "1.9" % "test",

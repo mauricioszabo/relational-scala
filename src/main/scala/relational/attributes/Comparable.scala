@@ -1,26 +1,32 @@
 package relational.attributes
 
 import relational.comparissions._
+import relational.comparissions.None
 
 trait Comparable extends AttributeLike {
   def ===(other: => Any ) = this == other
-  def ==(other: => Any ) = new Equality("=", this, Attribute.wrap(other))
   def ->(other: => Any ) = this == other
+  def ==(other: => Any ) = newEquality("=", other)
 
-  def !=(other: => Any ) = new Equality("<>", this, Attribute.wrap(other))
-  def <=(other: Any) = new Equality("<=", this, Attribute.wrap(other))
-  def <(other: Any) = new Equality("<", this, Attribute.wrap(other))
-  def >=(other: Any) = new Equality(">=", this, Attribute.wrap(other))
-  def >(other: Any) = new Equality(">", this, Attribute.wrap(other))
-
-  def isNull = new Function('null, this)
+  def !=(other: => Any ) = newEquality("<>", other)
+  def <=(other: Any) = newEquality("<=", other)
+  def <(other: Any) = newEquality("<", other)
+  def >=(other: Any) = newEquality(">=", other)
+  def >(other: Any) = newEquality(">", other)
 
   def =~(other: Any) = like(other)
-  def like(other: Any) = new Equality("LIKE", this, Attribute.wrap(other))
+  def like(other: Any) = newEquality("LIKE", other)
   def !~(other: Any) = notLike(other)
-  def notLike(other: Any) = new Equality("NOT LIKE", this, Attribute.wrap(other))
+  def notLike(other: Any) = newEquality("NOT LIKE", other)
 
-  def in(list: Seq[Any]) = new In(this, list)
+  protected def newEquality(kind: String, other: Any): Comparission = other match {
+    case None => None
+    case _ => new Equality(kind, this, Attribute.wrap(other))
+  }
+
+  def in(list: Seq[Any]): Comparission = new In(this, list)
+
+  def isNull: Comparission = new IsNull(this)
 
   def sum = new Function('sum, this)
   def avg = new Function('avg, this)

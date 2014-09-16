@@ -112,24 +112,5 @@ class AttributeTest extends WordSpec with matchers.ShouldMatchers {
     }
   }
 
-  "NULL attribute" should {
-    import comparissions.None
-    val nameFoo = name == "foo"
-
-    "not enter in OR" in {
-      pseudoSQL(None || nameFoo) should be === "\"examples\".\"name\" = 'foo'"
-      pseudoSQL(nameFoo || None) should be === "\"examples\".\"name\" = 'foo'"
-    }
-
-    "not enter in AND" in {
-      pseudoSQL(None && nameFoo) should be === "\"examples\".\"name\" = 'foo'"
-      pseudoSQL(nameFoo && None) should be === "\"examples\".\"name\" = 'foo'"
-    }
-
-    "not enter in NOT" in {
-      pseudoSQL(!None) should be === ""
-    }
-  }
-
   def pseudoSQL(a: attrs.AttributeLike) = a.partial.toPseudoSQL
 }

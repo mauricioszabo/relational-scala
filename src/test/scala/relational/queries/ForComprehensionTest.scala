@@ -106,7 +106,7 @@ class ForComprehensionTest extends WordSpec with matchers.ShouldMatchers with Be
         "`as`.`name` = 'boo' AND `bs`.`id` = 20)"
     }
 
-    "joins full queries with tables" in {
+    "queries on full queries with tables" in {
       val result = for {
         q <- query
         t <- Table('people)
@@ -116,6 +116,21 @@ class ForComprehensionTest extends WordSpec with matchers.ShouldMatchers with Be
       sqlFor(result) should be === "SELECT `bs`.`address` FROM `as`,`bs`,`people` WHERE (`as`.`id` = 10 AND " +
         "`as`.`name` = 'boo' AND `bs`.`id` = 20 AND `people`.`name` = 'bar')"
     }
+
+    "joins on queries with tables and full queries" in {
+      val result = for {
+        t <- Table('people)
+        q <- query
+        if t.id == q.as.people_id && q.as.id == q.bs.as_id
+      } yield q.any('address)
+
+      sqlFor(result) should be === "SELECT `bs`.`address` FROM `people` " +
+        "INNER JOIN `as` ON `people`.`id` = `as`.`people_id` " +
+        "INNER JOIN `bs` ON `as`.`id` = `bs`.`as_id` WHERE `as`.`id` = 10"
+    }
+  }
+
+  "Querying with aggregate functions" should {
   }
 
   def sqlFor(result: relational.Partial) = result.partial.toPseudoSQL

@@ -4,6 +4,7 @@ import org.scalatest._
 import org.scalatest.matchers.ShouldMatchers
 
 import relational._
+import relational.functions._
 
 class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
   object People extends Query {
@@ -54,8 +55,9 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
       results(address) should be === List((1, "Foo"), (1, "Foo"), (2, "Foo"), (3, "Bar"))
     }
 
-    "counts records on table" in {
-      val names = People query { implicit p => p select ('name.count.as("count"), 'name) group 'name }
+    "count records on table" in {
+      pending
+      val names = People query { implicit p => p select (Count('name).as("count"), 'name) group 'name }
 
       val results = names.copy(connection=globalConnection).results.map { e =>
         (e attribute 'count as Int, e get 'name)

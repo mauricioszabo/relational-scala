@@ -89,20 +89,6 @@ class AttributeTest extends WordSpec with matchers.ShouldMatchers {
       pseudoSQL(c1 && c2 && c3) should be ===
         """("examples"."name" = 'Foo' AND "examples"."id" = 10 AND "examples"."name" = 'Bar')"""
     }
-
-    "support SUM, AVERAGE, MAX, MIN, COUNT" in {
-      pseudoSQL(id.sum == 20) should be === "SUM(\"examples\".\"id\") = 20"
-      pseudoSQL(id.avg == 15) should be === "AVG(\"examples\".\"id\") = 15"
-      pseudoSQL(id.max == 15) should be === "MAX(\"examples\".\"id\") = 15"
-      pseudoSQL(id.min == 15) should be === "MIN(\"examples\".\"id\") = 15"
-      pseudoSQL(id.count == 15) should be === "COUNT(\"examples\".\"id\") = 15"
-    }
-
-    "support LENGTH, UPPER, LOWER" in {
-      pseudoSQL(name.length == 1) should be === "LENGTH(\"examples\".\"name\") = 1"
-      pseudoSQL(name.upper == "UP") should be === "UPPER(\"examples\".\"name\") = 'UP'"
-      pseudoSQL(name.lower == "up") should be === "LOWER(\"examples\".\"name\") = 'up'"
-    }
   }
 
   "Attributes ordering" should {

@@ -27,13 +27,4 @@ trait Comparable extends AttributeLike {
   def in(list: Seq[Any]): Comparission = new In(this, list)
 
   def isNull: Comparission = new IsNull(this)
-
-  def sum = new Function('sum, this)
-  def avg = new Function('avg, this)
-  def min = new Function('min, this)
-  def max = new Function('max, this)
-  def upper = new Function('upper, this)
-  def lower = new Function('lower, this)
-  def count = new Function('count, this)
-  def length = new Function('length, this)
 }

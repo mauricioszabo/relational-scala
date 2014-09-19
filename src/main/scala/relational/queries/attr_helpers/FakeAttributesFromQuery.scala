@@ -8,7 +8,7 @@ import relational.queries.FullQuery
 import relational.joins.{LeftJoin => LJoin, RightJoin, InnerJoin}
 import relational.tables.{TableLike, Table => RTable, Alias => TableAlias}
 
-class FakeAttributesFromQuery(query: FullQuery[_, _]) extends AttributesEntry[TableLike] {
+class FakeAttributesFromQuery(query: FullQuery[_, _]) extends AttributesEntry[FakeAttributesEntry] {
   protected val tablesFromJoin = query.selector.join.map(_.table)
 
   //TODO: Find a better way to pick up names of tables from a list
@@ -25,7 +25,15 @@ class FakeAttributesFromQuery(query: FullQuery[_, _]) extends AttributesEntry[Ta
   }}.toMap
 
   def selectDynamic(name: String) = tablesMap get name match {
-    case Some(table) => table
+    case Some(table) =>
+      val self = this
+      new FakeAttributesEntry(table) {
+        override def get[A](attributeName: Symbol): A = {
+          val attribute = FakeAttribute(table(attributeName.name))
+          self.attributesBeingUsed += attribute
+          default[A]
+        }
+      }
     case None => throw new IllegalArgumentException("there's no table named "
       + name + " on this SQL")
   }

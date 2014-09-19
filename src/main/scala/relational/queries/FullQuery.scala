@@ -15,7 +15,7 @@ class FullQuery[A, U](selector: Selector, resultStructure: AttributesEntry[A] =>
     new FullQuery[A, U](newSel, resultStructure)
   }
 
-  def map[B](fn: AttributesEntry[TableLike] => B) = {
+  def map[B](fn: AttributesEntry[FakeAttributesEntry] => B) = {
     val entries = new FakeAttributesFromQuery(this)
     fn(entries)
 
@@ -27,7 +27,7 @@ class FullQuery[A, U](selector: Selector, resultStructure: AttributesEntry[A] =>
       where=normalizer.where,
       join=normalizer.joins
     )
-    new FullQuery[TableLike, B](newSelector, fn)
+    new FullQuery[FakeAttributesEntry, B](newSelector, fn)
   }
 
   def flatMap[A, U](fn: FakeAttributesFromQuery => Query[A, U]) = {

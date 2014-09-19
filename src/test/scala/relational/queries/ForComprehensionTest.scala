@@ -106,7 +106,7 @@ class ForComprehensionTest extends WordSpec with matchers.ShouldMatchers with Be
         "`as`.`name` = 'boo' AND `bs`.`id` = 20)"
     }
 
-    "queries on full queries with tables" in {
+    "query on full queries with tables" in {
       val result = for {
         q <- query
         t <- Table('people)
@@ -117,7 +117,7 @@ class ForComprehensionTest extends WordSpec with matchers.ShouldMatchers with Be
         "`as`.`name` = 'boo' AND `bs`.`id` = 20 AND `people`.`name` = 'bar')"
     }
 
-    "joins on queries with tables and full queries" in {
+    "join on queries with tables and full queries" in {
       val result = for {
         t <- Table('people)
         q <- query
@@ -127,6 +127,16 @@ class ForComprehensionTest extends WordSpec with matchers.ShouldMatchers with Be
       sqlFor(result) should be === "SELECT `bs`.`address` FROM `people` " +
         "INNER JOIN `as` ON `people`.`id` = `as`.`people_id` " +
         "INNER JOIN `bs` ON `as`.`id` = `bs`.`as_id` WHERE `as`.`id` = 10"
+    }
+
+    "add more fields in the subsequent select" in {
+      val result = for {
+        q <- query
+        if q.as.name == "boo"
+      } yield q.as.any('age)
+
+      sqlFor(result) should be === "SELECT `as`.`age` FROM `as`,`bs` WHERE (`as`.`id` = 10 AND " +
+        "`as`.`name` = 'boo')"
     }
   }
 

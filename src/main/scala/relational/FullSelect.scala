@@ -1,7 +1,7 @@
 package relational
 
 trait FullSelect extends Partial {
-  def as(alias: String) = new tables.Alias(alias, "("+partial.query+")", partial.attributes)
+  def as(alias: String) = new tables.Alias(alias, this)
 
   val connection: java.sql.Connection
 

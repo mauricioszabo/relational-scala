@@ -7,7 +7,7 @@ class AliasTest extends WordSpec with matchers.ShouldMatchers {
 
   "Alias in tables" should {
     "rename tables in SELECT clauses" in {
-      newPeople.partial.toPseudoSQL should be === "\"people\" p"
+      newPeople.partial.toPseudoSQL should be === "\"people\" \"p\""
     }
 
     "rename attributes" in {
@@ -15,13 +15,13 @@ class AliasTest extends WordSpec with matchers.ShouldMatchers {
     }
 
     "rename itself" in {
-      newPeople.as("foo").partial.toPseudoSQL should be === "\"people\" foo"
+      newPeople.as("foo").partial.toPseudoSQL should be === "\"people\" \"foo\""
     }
   }
 
   "Alias in attributes" should {
     "rename attribute" in {
-      people('id).as("foo").selectPartial.toPseudoSQL should be === "\"people\".\"id\" foo"
+      people('id).as("foo").selectPartial.toPseudoSQL should be === "\"people\".\"id\" \"foo\""
       people('id).as("foo").partial.toPseudoSQL should be === "\"foo\""
     }
 
@@ -34,7 +34,7 @@ class AliasTest extends WordSpec with matchers.ShouldMatchers {
     val selector = new Selector(new clauses.Select(false, people, 'id), Seq(people))
 
     "rename queries" in {
-      selector.as("sql").partial.toPseudoSQL should be === "(SELECT \"people\".\"id\" FROM \"people\") sql"
+      selector.as("sql").partial.toPseudoSQL should be === "(SELECT \"people\".\"id\" FROM \"people\") \"sql\""
     }
 
     "rename attributes within those queries" in {

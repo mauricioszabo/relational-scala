@@ -115,7 +115,7 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
       }
 
       result.partial.toPseudoSQL should be === (
-        "SELECT \"sql\".\"id\" FROM (SELECT * FROM \"scala_people\" ORDER BY (\"scala_people\".\"id\") DESC) sql " +
+        "SELECT \"sql\".\"id\" FROM (SELECT * FROM \"scala_people\" ORDER BY (\"scala_people\".\"id\") DESC) \"sql\" " +
         "INNER JOIN \"scala_addresses\" ON \"sql\".\"id\" = \"scala_addresses\".\"person_id\" " +
         "ORDER BY \"sql\".\"name\""
       )

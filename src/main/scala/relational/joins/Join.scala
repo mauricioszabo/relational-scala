@@ -14,3 +14,13 @@ trait Join extends Partial {
       tablePartial.attributes ++ condPartial.attributes)
   }
 }
+
+object Join {
+  def unapply(obj: Join): Option[(tables.TableLike, comparissions.Comparission, Symbol)] = {
+    obj match {
+      case LeftJoin(table, comparission) => Some((table, comparission, 'left))
+      case RightJoin(table, comparission) => Some((table, comparission, 'right))
+      case InnerJoin(table, comparission) => Some((table, comparission, 'inner))
+    }
+  }
+}

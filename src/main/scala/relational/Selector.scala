@@ -52,7 +52,7 @@ case class Selector(
 
   private def multiElementsQuery(before: String, elements: Seq[Partial], tuple: (String, Seq[Any])): (String, Seq[Any]) = {
     if(elements.isEmpty) return tuple
-    val first::rest = elements
+    val first::rest = elements.toList
     rest.foldLeft(constructQuery(tuple, before, first)) { constructQuery(_, ",", _) }
   }
 

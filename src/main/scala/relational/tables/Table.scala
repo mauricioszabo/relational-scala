@@ -7,5 +7,5 @@ case class Table(private val name: String)(implicit adapter: Adapter) extends Ta
   lazy val partial = new PartialStatement(representation, Nil)
   def representation = Escape(name)
   def apply(attribute: String) = new attributes.Attribute(this, attribute)
-  def as(name: String) = new Alias(name, partial.query, partial.attributes)
+  def as(name: String) = new Alias(name, this)
 }

@@ -44,4 +44,6 @@ object Select {
 
   def distinct(table: tables.TableLike, attrs: Any*) =
     new Select(true, table, attrs: _*)
+
+  def select(attrs: attributes.AttributeLike*) = new Select(false, null, attrs: _*)
 }

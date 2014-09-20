@@ -5,7 +5,7 @@ import relational.attributes._
 
 trait Function extends Comparable
 
-abstract class SqlFunction(implicit adapter: Adapter) {
+abstract class SqlFunction[A](implicit adapter: Adapter) {
   type SeqToPartial = Seq[Partial] => (String, Seq[Any])
   type DriverAndFunction = (Symbol, SeqToPartial)
 
@@ -32,7 +32,7 @@ abstract class SqlFunction(implicit adapter: Adapter) {
 
   def defineByFunction(functions: DriverAndFunction*) = function = functions.toMap
 
-  def apply(params: Any*): Comparable = {
+  def apply(params: Any*)(implicit a: Adapter): Comparable = {
     val normalized = params.map { p => Attribute.wrap(p) }
     val (query, attributes) = getFunction(normalized)
     createFn(query, attributes, normalized)
@@ -50,7 +50,7 @@ abstract class SqlFunction(implicit adapter: Adapter) {
     }
 }
 
-abstract class SqlAggregateFunction(implicit adapter: Adapter) extends SqlFunction()(adapter) {
+abstract class SqlAggregateFunction[A](implicit adapter: Adapter) extends SqlFunction[A]()(adapter) {
   val index: Int
 
   override protected def createFn(query: String, attrs: Seq[Any], norm: Seq[Partial]): Function with Aggregation =

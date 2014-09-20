@@ -4,14 +4,20 @@ import relational.queries.Query
 import relational.clauses.Select
 import relational.queries.Table
 import relational.comparissions._
-import relational.attributes.{Attribute => RAttr, AttributeLike}
+import relational.functions.Aggregation
+import relational.attributes.{Attribute => RAttr, AttributeLike, Alias}
 import relational.tables.TableLike
 import relational.joins._
+import relational.{Selector, QueryAnalyzer}
 
-class AttributeNormalizer[U]( allTables: List[TableLike], allJoins: List[Join], conditions: Comparission) {
-  var from = allTables
-  var joins = allJoins
-  var where = normalizeComparissions(conditions)
+class AttributeNormalizer[U](oldSelector: Selector, attributes: Seq[AttributeLike],
+                              newTables: Vector[TableLike], newConditions: Comparission) {
+
+  val selectAttrs = oldSelector.select ++ attributes
+  var from = (newTables ++ oldSelector.from).toList
+  var joins = oldSelector.join.toList
+  val where = normalizeComparissions(newConditions && oldSelector.where)
+  val groups = oldSelector.group.toBuffer ++ extractGroupBy(selectAttrs)
 
   private def normalizeComparissions(c: Comparission): Comparission = c match {
     case Equality(_, a1: RAttr, a2: RAttr) =>
@@ -36,4 +42,35 @@ class AttributeNormalizer[U]( allTables: List[TableLike], allJoins: List[Join], 
       comparission
     }
   }
+
+  private def extractGroupBy(attributes: Seq[AttributeLike]) = {
+    val nonAliased = attributes.map {
+      case Alias(_, a: Aggregation) => a.aggregated
+      case Alias(_, a) => a
+      case a: AttributeLike => a
+    }
+    val analyzer = new QueryAnalyzer(oldSelector.copy(select=Select.select(nonAliased: _*)))
+
+    val groupingFunctions = attributes.flatMap {
+      case(a: Aggregation) => Seq(a.aggregated)
+      case Alias(_, a: Aggregation) => Seq(a.aggregated)
+      case _ => Seq()
+    }.toSet
+    val nonGrouped = (nonAliased diff groupingFunctions.toSeq).toSet
+
+    for {
+      fields <- analyzer.fields
+      if !(fields & groupingFunctions).isEmpty
+      ungroupedMatches = (fields & nonGrouped.toSet)
+      if !ungroupedMatches.isEmpty
+    } yield ungroupedMatches.head
+  }
+
+  def selector = oldSelector.copy(
+    select=Select.select(selectAttrs: _*),
+    from=from,
+    join=joins,
+    where=where,
+    group=groups
+  )
 }

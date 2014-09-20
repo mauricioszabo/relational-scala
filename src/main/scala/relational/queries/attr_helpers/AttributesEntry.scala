@@ -7,6 +7,8 @@ import relational.attributes.{Comparable, Attribute => RAttr}
 import relational.queries.FullQuery
 import relational.joins.{LeftJoin => LJoin, RightJoin, InnerJoin}
 import relational.tables.{TableLike, Table => RTable, Alias => TableAlias}
+import relational.functions.SqlFunction
+import relational.Partial
 
 import java.sql.ResultSet
 
@@ -27,6 +29,8 @@ trait AttributesEntry[+A] extends Dynamic {
   def any(attributeName: Symbol): Any = get[Any](attributeName)
 
   def get[A](attributeName: Symbol): A
+  def get[A](function: SqlFunction[A], params: Partial*): A
+  def get[A](function: SqlFunction[A], param: Symbol): A
 }
 
 class AttributesFromResultSet(rs: ResultSet) extends AttributesEntry[Nothing] {
@@ -37,4 +41,7 @@ class AttributesFromResultSet(rs: ResultSet) extends AttributesEntry[Nothing] {
   def get[A](attributeName: Symbol): A = {
     rs.getObject(attributeName.name).asInstanceOf[A]
   }
+
+  def get[A](function: relational.functions.SqlFunction[A],param: Symbol): A = ???
+  def get[A](function: relational.functions.SqlFunction[A],params: relational.Partial*): A = ???
 }

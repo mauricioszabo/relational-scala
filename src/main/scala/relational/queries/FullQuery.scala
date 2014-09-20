@@ -7,7 +7,8 @@ import relational.tables.{TableLike, Table => RTable, Alias => TableAlias}
 import java.sql.ResultSet
 
 class FullQuery[A, U](selector: Selector, resultStructure: AttributesEntry[A] => U)
-        extends Query[A, U](selector, resultStructure) {
+                     (implicit val a: Adapter)
+                     extends Query[A, U](selector, resultStructure) {
 
   def withFilter(fn: FakeAttributesFromQuery => comparissions.Comparission) = {
     val entries = new FakeAttributesFromQuery(this)
@@ -19,15 +20,13 @@ class FullQuery[A, U](selector: Selector, resultStructure: AttributesEntry[A] =>
     val entries = new FakeAttributesFromQuery(this)
     fn(entries)
 
-    val normalizer = new AttributeNormalizer(selector.from.toList, selector.join.toList, selector.where)
-
-    val newSelector = selector.copy(
-      select=clauses.Select.select(selector.from.head, entries.attributes :_*),
-      from=normalizer.from,
-      where=normalizer.where,
-      join=normalizer.joins
+    val normalizer = new AttributeNormalizer(
+      selector.copy(select=Select.select()),
+      entries.attributes,
+      Vector(),
+      comparissions.None
     )
-    new FullQuery[FakeAttributesEntry, B](newSelector, fn)
+    new FullQuery[FakeAttributesEntry, B](normalizer.selector, fn)
   }
 
   def flatMap[A, U](fn: FakeAttributesFromQuery => Query[A, U]) = {
@@ -38,18 +37,17 @@ class FullQuery[A, U](selector: Selector, resultStructure: AttributesEntry[A] =>
   }
 
   private def joinSelectors[U](entries: FakeAttributesFromQuery, query: Query[_, U]) = {
-    val currentSelector = query.selector
-    val allFields = entries.attributes ++ currentSelector.select
-    val allTables = selector.from.toVector ++ currentSelector.from
-    val allJoins = currentSelector.join.toList
-    val conditions = selector.where && currentSelector.where
-    val normalizer = new AttributeNormalizer(allTables.toList, allJoins, conditions)
+    val normalized = new AttributeNormalizer(
+      query.selector,
+      entries.attributes,
+      selector.from.toVector,
+      selector.where
+    )
 
-    selector.copy(
-      select=Select.select(selector.from.head, allFields: _*),
-      from=normalizer.from,
-      where=normalizer.where,
-      join=normalizer.joins
+    val newSelector = normalized.selector
+    newSelector.copy(
+      join=selector.join ++ newSelector.join,
+      having=selector.having && newSelector.having
     )
   }
 }

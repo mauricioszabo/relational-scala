@@ -11,6 +11,8 @@ class Table protected(val table: tables.TableLike, val filter: Comparission = No
                      (implicit adapter: Adapter) extends Partial {
   lazy val partial = table.partial
 
+  def as(name: String) = new Table(table.as(name), filter)(adapter)
+
   def withFilter(fn: tables.TableLike => comparissions.Comparission) = {
     new Table(table, fn(table))
   }
@@ -19,12 +21,14 @@ class Table protected(val table: tables.TableLike, val filter: Comparission = No
     val entries = new FakeAttributesEntry(table)
     fn(entries)
 
-    val selector = Selector(
-      select=Select.select(table, entries.attributes: _*),
-      from=List(table),
-      where=filter
+    val normalized = new AttributeNormalizer(
+      Selector(Select.select(table), List(table)),
+      entries.attributes,
+      Vector(),
+      filter
     )
-    new FullQuery[Comparable, U](selector, fn)
+
+    new FullQuery[Comparable, U](normalized.selector, fn)
   }
 
   def flatMap[A, U](fn: FakeAttributesEntry => Query[A, U]) = {
@@ -36,18 +40,13 @@ class Table protected(val table: tables.TableLike, val filter: Comparission = No
 
   private def joinSelectors[U](entries: FakeAttributesEntry, query: Query[_, U]) = {
     val selector = query.selector
-    val allFields = entries.attributes ++ selector.select
-    val allTables = table::selector.from.toList
-    val allJoins = selector.join.toList
-    val conditions = filter && selector.where
-    val normalizer = new AttributeNormalizer(allTables, allJoins, conditions)
-
-    Selector(
-      select=Select.select(table, allFields: _*),
-      from=normalizer.from,
-      where=normalizer.where,
-      join=normalizer.joins
+    val normalized = new AttributeNormalizer(
+      query.selector,
+      entries.attributes,
+      Vector(table),
+      filter
     )
+    normalized.selector
   }
 }
 

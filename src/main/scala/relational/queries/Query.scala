@@ -5,7 +5,9 @@ import relational._
 import java.sql.ResultSet
 
 class Query[A, U](protected[queries] val selector: Selector,
-               protected[queries] val resultStructure: AttributesEntry[A] => U) extends Partial {
+                  protected[queries] val resultStructure: AttributesEntry[A] => U)
+                 (implicit a: Adapter) extends Partial {
+
   val partial = selector.partial
 
   def asStream(fn: PartialStatement => ResultSet) = {

@@ -2,6 +2,8 @@ package test.relational.queries
 
 import relational.queries._
 import org.scalatest._
+import relational.functions._
+
 
 class ForComprehensionTest extends WordSpec with matchers.ShouldMatchers with BeforeAndAfterEach {
   implicit val adapter = new relational.Adapter('mysql)
@@ -29,7 +31,7 @@ class ForComprehensionTest extends WordSpec with matchers.ShouldMatchers with Be
         if(child.name == "Foo")
       } yield Map('age -> child.get('age), 'name -> user.get('name))
 
-      sqlFor(result) should be === "SELECT `people`.`name`, `children`.`age` FROM `people`,`children` " +
+      sqlFor(result) should be === "SELECT `children`.`age`, `people`.`name` FROM `people`,`children` " +
         "WHERE `children`.`name` = 'Foo'"
     }
 
@@ -40,7 +42,7 @@ class ForComprehensionTest extends WordSpec with matchers.ShouldMatchers with Be
         if(user.name == "Foo")
       } yield Map('age -> child.get('age), 'name -> user.get('name))
 
-      sqlFor(result) should be === "SELECT `people`.`name`, `children`.`age` FROM `people`,`children` " +
+      sqlFor(result) should be === "SELECT `children`.`age`, `people`.`name` FROM `people`,`children` " +
         "WHERE `people`.`name` = 'Foo'"
     }
 
@@ -50,7 +52,7 @@ class ForComprehensionTest extends WordSpec with matchers.ShouldMatchers with Be
         if(user.name == "Foo")
         child <- Table('children)
         if(child.name == "Bar")
-      } yield Map('age -> child.get('age))
+      } yield Map('age -> child.any('age))
 
       sqlFor(result) should be === "SELECT `children`.`age` FROM `people`,`children` " +
         "WHERE (`people`.`name` = 'Foo' AND `children`.`name` = 'Bar')"
@@ -90,6 +92,43 @@ class ForComprehensionTest extends WordSpec with matchers.ShouldMatchers with Be
 
       sqlFor(result) should be === "SELECT `people`.`id` FROM `people` INNER JOIN `children` " +
         "ON `people`.`id` = `children`.`parent_id` WHERE `people`.`name` = 'Foo'"
+    }
+  }
+
+  "Querying with aggregate functions" should {
+    "add the aggregated on group by" in {
+      val result = for( p <- Table('people) ) yield p.get(Count, 'name)
+      sqlFor(result) should be === "SELECT COUNT(`people`.`name`) `count_people_name_` FROM `people`"
+
+      val grouped = for( p <- Table('people) ) yield p.any('name) -> p.get(Count, p.name)
+      sqlFor(grouped) should be === "SELECT `people`.`name`, COUNT(`people`.`name`) `count_people_name_` " +
+        "FROM `people` GROUP BY `people`.`name`"
+    }
+
+    "add the aggregated on group by when referenced by a join or where" in {
+      val result = for {
+        p <- Table('people)
+        j <- Table('joined)
+        if j.person_id == p.id
+      } yield (j.any('person_id), p.get(Count, 'id))
+
+      sqlFor(result) should be === "SELECT `joined`.`person_id`, COUNT(`people`.`id`) `count_people_id_` " +
+        "FROM `people` INNER JOIN `joined` ON `joined`.`person_id` = `people`.`id` " +
+        "GROUP BY `joined`.`person_id`"
+    }
+
+    "WOO!!!" should {
+      val criticalComponents = for( cc <- Table('critical_components) if cc.id < 4000) yield cc.id
+
+      val countedCC = for(ccc <- Table('critical_comp_criticidades))
+                      yield ccc.get[Int]('criticidade_id) -> ccc.get(Count, ccc.criticidade_id)
+
+      val countedAnalysed = for {
+        ccc <- Table('critical_comp_criticidades)
+        analyzed <- criticalComponents
+        if ccc.critical_component_id == analyzed.critical_components.id
+      } yield (ccc any 'criticidade_id, analyzed.critical_components.get(CountDistinct, 'id))
+      println(sqlFor(countedAnalysed))
     }
   }
 
@@ -138,9 +177,23 @@ class ForComprehensionTest extends WordSpec with matchers.ShouldMatchers with Be
       sqlFor(result) should be === "SELECT `as`.`age` FROM `as`,`bs` WHERE (`as`.`id` = 10 AND " +
         "`as`.`name` = 'boo')"
     }
+
+    "query for grouping functions" in {
+      val result = for(q <- query) yield (q.as any 'age, q.get(Count, q.as.age))
+      sqlFor(result) should be === "SELECT `as`.`age`, COUNT(`as`.`age`) count_as_age_ FROM `as`,`bs` " +
+        "WHERE `as`.`id` = 10 GROUP BY `as`.`age`"
+    }
   }
 
-  "Querying with aggregate functions" should {
+  "Aliasing tables and queries" should {
+    "alias a table" in {
+      val result = for {
+        t <- Table('people).as("p")
+        if t.id == 10
+      } yield t any 'name
+
+      sqlFor(result) should be === "SELECT `p`.`name` FROM `people` `p` WHERE `p`.`id` = 10"
+    }
   }
 
   def sqlFor(result: relational.Partial) = result.partial.toPseudoSQL

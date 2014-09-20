@@ -16,7 +16,5 @@ class Adapter(d: Symbol) {
 }
 
 object Adapter extends Adapter {
-  implicit val default = {
-    this
-  }
+  implicit val default = this
 }

@@ -20,7 +20,8 @@ abstract class SqlFunction[A](implicit adapter: Adapter) {
           val index = matchElement.group(1).toInt
           val partial = params(index).partial
 
-          val q = query.replaceAll("\\$" + index, partial.query)
+          //FIXME: Consertar isso URGENTE!
+          val q = query.replaceAll("\\$" + index, partial.sql(null))
           val a = attributes ++ partial.attributes
           (q, a)
         }

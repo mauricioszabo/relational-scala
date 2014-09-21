@@ -13,17 +13,18 @@ class Select(distinct: Boolean, table: tables.TableLike, listOfAttributes: Any*)
   lazy val attributeList = convert(listOfAttributes.toList).toVector
 
   lazy val partial = {
+    val sqlNil = Seq[Adapter => String]()
     val nil = Seq[Any]()
-    val(queries, attributes) = attributeList.foldLeft(nil -> nil) { case ((query, attributes), attr) =>
+    val(sqls, attributes) = attributeList.foldLeft(sqlNil -> nil) { case ((sql, attributes), attr) =>
       val sp = attr.selectPartial
-      ( query :+ sp.query, attributes ++ sp.attributes)
+      (sql :+ sp.sql, attributes ++ sp.attributes)
     }
 
     val clause = if(distinct)
       "SELECT DISTINCT "
     else
       "SELECT "
-    new PartialStatement(clause + queries.mkString(", "), attributes)
+    new PartialStatement(attributes)(a => clause + sqls.map(s => s(a)).mkString(", "))
   }
 
   private def convert(list: List[Any]): List[attributes.AttributeLike] = list match {

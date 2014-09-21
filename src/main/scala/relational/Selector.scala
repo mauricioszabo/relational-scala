@@ -18,6 +18,8 @@ case class Selector(
 
   def this(s: Selector) = this(s.select, s.from, s.where, s.group, s.having, s.join, s.order, s.connection, s.limit, s.offset)
 
+  type Sql = (Adapter => String)
+
   def results = try {
     new Promisse(resultSet)
   } catch {
@@ -47,39 +49,40 @@ case class Selector(
 
   private def constructSelect = {
     val partial = select.partial
-    (partial.query, partial.attributes)
+    (partial.sql, partial.attributes)
   }
 
-  private def multiElementsQuery(before: String, elements: Seq[Partial], tuple: (String, Seq[Any])): (String, Seq[Any]) = {
+  private def multiElementsQuery(before: String, elements: Seq[Partial], tuple: (Sql, Seq[Any])): (Sql, Seq[Any]) = {
     if(elements.isEmpty) return tuple
     val first::rest = elements.toList
     rest.foldLeft(constructQuery(tuple, before, first)) { constructQuery(_, ",", _) }
   }
 
-  private def whereQuery(before: String, tuple: (String, Seq[Any]), where: comparissions.Comparission) = {
+  private def whereQuery(before: String, tuple: (Sql, Seq[Any]), where: comparissions.Comparission) = {
     constructQuery(tuple, before, where)
   }
 
-  private def constructQuery(tuple: (String, Seq[Any]), before: String, element: Partial) = {
-    var (query, list) = tuple
+  private def constructQuery(tuple: (Sql, Seq[Any]), before: String, element: Partial): (Sql, Seq[Any]) = {
+    var (sql, list) = tuple
     val partial = element.partial
+    def combineSql(a: Adapter) = sql(a) + before + partial.sql(a)
     list ++= partial.attributes
-    (query + before + partial.query, list)
+    (combineSql, list)
   }
 
-  private def constructOrder(tuple: (String, Seq[Any])) = {
-    val (tquery, tattributes) = tuple
-    val(query, attributes) = order.foldLeft( (Seq[String](), tattributes) ) { case ((query, attributes), partial) =>
+  private def constructOrder(tuple: (Sql, Seq[Any])): (Sql, Seq[Any]) = {
+    val (tsql, tattributes) = tuple
+    val(sql, attributes) = order.foldLeft( (Seq[Sql](), tattributes) ) { case ((sql, attributes), partial) =>
       val sp = partial.partial
       val q = if(partial.isInstanceOf[FullSelect])
-        "(" + sp.query + ")"
+        { a: Adapter => "(" + sp.sql(a) + ")" }
       else
-        sp.query
+        sp.sql
 
-      ( query :+ q, attributes ++ sp.attributes)
+      ( sql :+ q, attributes ++ sp.attributes)
     }
 
-    val rquery = tquery + " ORDER BY " + query.mkString("), (")
-    (rquery, attributes)
+    def rsql(a: Adapter) = tsql(a) + " ORDER BY " + sql.map(s => s(a)).mkString("), (")
+    (rsql, attributes)
   }
 }

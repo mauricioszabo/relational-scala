@@ -1,13 +1,13 @@
 package relational.comparissions
 
-import relational.PartialStatement
+import relational.{Adapter, PartialStatement}
 
 case class And(comparissions: Vector[Comparission]) extends Comparission {
   lazy val partial = {
     val partials = comparissions.view.map { _.partial }
-    val query = "(" + partials.map { p => p.query }.mkString(" AND ") + ")"
+    def sql(a: Adapter) = "(" + partials.map { p => p.sql(a) }.mkString(" AND ") + ")"
     val attributes = partials.flatMap { _.attributes }
-    new PartialStatement(query, attributes)
+    new PartialStatement(attributes)(sql)
   }
 }
 

@@ -5,58 +5,71 @@ import relational.attributes._
 
 trait Function extends Comparable
 
-abstract class SqlFunction[A](implicit adapter: Adapter) {
-  type SeqToPartial = Seq[Partial] => (String, Seq[Any])
+trait SqlFunction[A] {
+  type PartialTuple = String => Seq[Any]
+
+  type Sql = Adapter => String
+  type SeqToPartial = Seq[Partial] => (Sql, Seq[Any])
   type DriverAndFunction = (Symbol, SeqToPartial)
 
-  var function = Map[Symbol, SeqToPartial]()
+  def define(s: (Symbol, String)*) = ???
+  def apply(s: Any*): Comparable = ???
 
-  def define(stringFunctions: (Symbol, String)*) = {
-    val functions = stringFunctions.map { case(driver, string) =>
-      val function = { (params: Seq[Partial]) =>
-        val matchList = """\$(\d+)""".r.findAllMatchIn(string)
+  //var function: Adapter => PartialFunction[Symbol, PartialTuple] = _
 
-        matchList.foldLeft(string -> List[Any]()) { case((query, attributes), matchElement) =>
-          val index = matchElement.group(1).toInt
-          val partial = params(index).partial
+  ////def define(stringFunctions: (Symbol, String)*) = {
+  ////  val fnForEachDriver = stringFunctions.map { case(driver, string) =>
+  ////    val fn = { (params: Seq[Partial]) =>
+  ////      val attributes = params.flatMap(_.partial.attributes)
 
-          //FIXME: Consertar isso URGENTE!
-          val q = query.replaceAll("\\$" + index, partial.sql(null))
-          val a = attributes ++ partial.attributes
-          (q, a)
-        }
-      }
-      (driver, function)
-    }
-    defineByFunction(functions: _*)
-  }
+  ////      val sqlString = { adapter: Adapter =>
+  ////        val matchList = """\$(\d+)""".r.findAllMatchIn(string)
 
-  def defineByFunction(functions: DriverAndFunction*) = function = functions.toMap
+  ////        matchList.foldLeft(string) { (query, matchElement) =>
+  ////          val index = matchElement.group(1).toInt
+  ////          val partial = params(index).partial
+  ////          query.replaceAll("\\$" + index, partial.sql(adapter))
+  ////        }
+  ////      }
+  ////      (sqlString, attributes)
+  ////    }
+  ////    (driver, fn)
+  ////  }
+  ////  defineByFunction(fnForEachDriver: _*)
+  ////}
 
-  def apply(params: Any*)(implicit a: Adapter): Comparable = {
-    val normalized = params.map { p => Attribute.wrap(p) }
-    val (query, attributes) = getFunction(normalized)
-    createFn(query, attributes, normalized)
-  }
+  ////def defineByFunction(functions: DriverAndFunction*) = function = functions.toMap
 
-  private def getFunction: Seq[Partial] => (String, Seq[Any]) =
-    function.get(adapter.currentDriver) match {
-      case Some(function) => function
-      case _ => function('all)
-    }
+  //def defineByFunction(functions: Adapter => PartialFunction[Symbol, PartialTuple]) = {
+  //  function = functions
+  //}
 
-  protected def createFn(query: String, attributes: Seq[Any], n: Seq[Partial]): Comparable =
+  //def apply(params: Any*): Comparable = {
+  //  val normalized = params.map { p => Attribute.wrap(p) }
+  //  val (query, attributes) = getFunction(normalized)
+  //  createFn(query, attributes, normalized)
+  //}
+
+  //private def getFunction: Seq[Partial] => (Sql, Seq[Any]) = {
+  //  val fn = function(
+  //  function.applyOrElse(
+  //  function.get(adapter.currentDriver) match {
+  //    case Some(function) => function
+  //    case _ => function('all)
+  //  }
+
+  protected def createFn(sql: Sql, attributes: Seq[Any], n: Seq[Partial]): Comparable =
     new Function {
-      lazy val partial = new PartialStatement(query, attributes)
+      lazy val partial = new PartialStatement(attributes)(sql)
     }
 }
 
-abstract class SqlAggregateFunction[A](implicit adapter: Adapter) extends SqlFunction[A]()(adapter) {
+abstract class SqlAggregateFunction[A] extends SqlFunction[A] {
   val index: Int
 
-  override protected def createFn(query: String, attrs: Seq[Any], norm: Seq[Partial]): Function with Aggregation =
+  override protected def createFn(sql: Sql, attrs: Seq[Any], norm: Seq[Partial]): Function with Aggregation =
     new Function with Aggregation {
-      lazy val partial = new PartialStatement(query, attrs)
+      lazy val partial = new PartialStatement(attrs)(sql)
       val aggregated = norm(index).asInstanceOf[AttributeLike]
     }
 }

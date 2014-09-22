@@ -7,7 +7,6 @@ import relational.tables.{TableLike, Table => RTable, Alias => TableAlias}
 import java.sql.ResultSet
 
 class FullQuery[A, U](selector: Selector, resultStructure: AttributesEntry[A] => U)
-                     (implicit val a: Adapter)
                      extends Query[A, U](selector, resultStructure) {
 
   def withFilter(fn: FakeAttributesFromQuery => comparissions.Comparission) = {

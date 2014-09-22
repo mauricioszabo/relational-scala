@@ -8,10 +8,10 @@ import relational.comparissions.{Comparission, None}
 import relational.clauses.Select
 
 class Table protected(val table: tables.TableLike, val filter: Comparission = None)
-                     (implicit adapter: Adapter) extends Partial {
+                      extends Partial {
   lazy val partial = table.partial
 
-  def as(name: String) = new Table(table.as(name), filter)(adapter)
+  def as(name: String) = new Table(table.as(name), filter)
 
   def withFilter(fn: tables.TableLike => comparissions.Comparission) = {
     new Table(table, fn(table))
@@ -51,6 +51,6 @@ class Table protected(val table: tables.TableLike, val filter: Comparission = No
 }
 
 object Table {
-  def apply(name: String)(implicit adapter: Adapter) = new Table(new tables.Table(name))
-  def apply(name: Symbol)(implicit adapter: Adapter) = new Table(new tables.Table(name.name))
+  def apply(name: String) = new Table(new tables.Table(name))
+  def apply(name: Symbol) = new Table(new tables.Table(name.name))
 }

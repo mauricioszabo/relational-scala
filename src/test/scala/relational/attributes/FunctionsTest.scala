@@ -11,11 +11,19 @@ class FunctionsTest extends WordSpec with test.relational.Helpers {
   "Function" should {
     "create a function in SQL" in {
       object Foobar extends SqlFunction {
-        defineByFunction('all -> { case Seq(p, param) =>
-          (
-            "FOO_BAR(" + p.partial.query + ", "+ param.partial.query + ")",
-            p.partial.attributes.toVector ++ param.partial.attributes
-          )
+        //defineByFunction('all -> { case Seq(p, param) =>
+        //  (
+        //    { a: Adapter => "FOO_BAR(" + p.partial.sql(a) + ", "+ param.partial.sql(a) + ")" },
+        //    p.partial.attributes.toVector ++ param.partial.attributes
+        //  )
+        //})
+        defineByFunction(adapter => {
+          case 'all => {
+            case Seq(p, param) => (
+              "FOO_BAR(" + p.partial.sql(a) + ", "+ param.partial.sql(a) + ")",
+              p.partial.attributes.toVector ++ param.partial.attributes
+            )
+          }
         })
       }
       Foobar(name, 10).partial.toPseudoSQL should be === """FOO_BAR("examples"."name", 10)"""

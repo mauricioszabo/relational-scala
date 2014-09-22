@@ -7,7 +7,7 @@ trait TableLike extends Partial with Dynamic {
   def as: Alias = as(Random.generate(5))
   def as(name: String): Alias
 
-  def representation: String
+  def representation(a: Adapter): String
 
   def selectDynamic(field: String) = apply(field)
   def apply(attribute: Symbol): attributes.Attribute = this(attribute.name)
@@ -15,5 +15,5 @@ trait TableLike extends Partial with Dynamic {
 
   def * = new attributes.AllInTable(this)
 
-  override def toString = getClass.getName + "("+representation+")"
+  override def toString = getClass.getName + "("+representation(Adapter)+")"
 }

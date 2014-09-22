@@ -6,7 +6,7 @@ import java.sql.ResultSet
 
 class Query[A, U](protected[queries] val selector: Selector,
                   protected[queries] val resultStructure: AttributesEntry[A] => U)
-                 (implicit a: Adapter) extends Partial {
+                  extends Partial {
 
   val partial = selector.partial
 

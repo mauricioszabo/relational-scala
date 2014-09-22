@@ -6,8 +6,6 @@ case class PartialStatement(sql: Adapter => String, attributes: Seq[Any]) {
   def this(attributes: Seq[Any])(sql: Adapter => String) = this(sql, attributes)
   def this(query: String, attributes: Seq[Any]) = this(attributes)(a => query)
 
-  //def query(implicit adapter: Adapter) = adapter2String(adapter)
-
   def toPseudoSQL(implicit adapter: Adapter) = {
     val query = sql(adapter)
     normalizedAttrs.foldLeft(query) { (query, attribute) =>

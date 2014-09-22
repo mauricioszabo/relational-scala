@@ -1,5 +1,6 @@
 package test.relational.queries
 
+import relational.Adapter
 import relational.queries._
 import org.scalatest._
 import relational.attributes.AttributeLike
@@ -30,7 +31,7 @@ class DatabaseSearchTest extends WordSpec with tests.DatabaseSetup with matchers
   }
 
   def createStatement(partial: PartialStatement) = {
-    val statement = globalConnection.prepareStatement(partial.query)
+    val statement = globalConnection.prepareStatement(partial.sql(Adapter))
     setParams(statement, partial.attributes)
     statement.executeQuery
   }

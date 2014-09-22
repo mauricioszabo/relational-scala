@@ -10,7 +10,7 @@ import relational.joins.{LeftJoin => LJoin, RightJoin, InnerJoin}
 import relational.tables.{TableLike, Table => RTable, Alias => TableAlias}
 
 class FakeAttributesFromQuery(query: FullQuery[_, _])
-                             (implicit a: Adapter) extends AttributesEntry[FakeAttributesEntry] {
+                              extends AttributesEntry[FakeAttributesEntry] {
   protected val tablesFromJoin = query.selector.join.map(_.table)
 
   //TODO: Find a better way to pick up names of tables from a list
@@ -50,7 +50,7 @@ class FakeAttributesFromQuery(query: FullQuery[_, _])
     val fn = function(params: _*)
     val regexp = """[^\d\w]+""".r
     val aliasName = regexp.replaceAllIn(fn.partial.toPseudoSQL, "_").toLowerCase
-    val attribute = FakeAttribute(AttrAlias(aliasName, fn)(a))
+    val attribute = FakeAttribute(AttrAlias(aliasName, fn))
     attributesBeingUsed += attribute
     default[A]
   }

@@ -8,7 +8,7 @@ case class Alias(private val name: String,
                  private val table: Partial) extends TableLike {
 
   def as(name: String) = new Alias(name, table)
-  lazy val representation = Escape(name)
+  def representation(a: Adapter) = Escape(a, name)
   def partial = {
     val ps = new PartialStatement(tPartial.attributes)(_: Adapter => String)
     table match {

@@ -2,7 +2,6 @@ package relational.queries.attr_helpers
 
 import scala.language.dynamics
 import scala.language.implicitConversions
-import relational.Adapter
 import relational.tables.TableLike
 import relational.attributes.{Comparable, Attribute => RAttr, Alias => AttrAlias}
 import relational.queries.FullQuery
@@ -11,7 +10,7 @@ import relational.tables.{TableLike, Table => RTable, Alias => TableAlias}
 
 import java.sql.ResultSet
 
-class FakeAttributesEntry(table: TableLike)(implicit a: Adapter) extends AttributesEntry[Comparable] {
+class FakeAttributesEntry(table: TableLike) extends AttributesEntry[Comparable] {
   def selectDynamic(attributeName: String): Comparable = table(attributeName)
 
   def get[A](attributeName: Symbol): A = {
@@ -32,7 +31,7 @@ class FakeAttributesEntry(table: TableLike)(implicit a: Adapter) extends Attribu
     val fn = function(attr)
     val regexp = """[^\d\w]+""".r
     val aliasName = regexp.replaceAllIn(fn.partial.toPseudoSQL, "_").toLowerCase
-    addAttributeToList(FakeAttribute(AttrAlias(aliasName, fn)(a)))
+    addAttributeToList(FakeAttribute(AttrAlias(aliasName, fn)))
     default[A]
   }
 

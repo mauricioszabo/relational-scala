@@ -10,8 +10,8 @@ trait Partial {
 
   def equivalentTo(other: Partial) = {
     val adapter = new Adapter
-    val PartialStatement(thisSQL, thisAttributes) = this.partial
-    val PartialStatement(otherSQL, otherAttributes) = other.partial
-    thisSQL(adapter) == otherSQL(adapter) && thisAttributes == otherAttributes
+    val (thisQuery, thisAttrs) = this.partial.tuple(adapter)
+    val (otherQuery, otherAttrs) = other.partial.tuple(adapter)
+    thisQuery == otherQuery && thisAttrs == otherAttrs
   }
 }

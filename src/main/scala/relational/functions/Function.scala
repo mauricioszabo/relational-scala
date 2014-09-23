@@ -58,18 +58,18 @@ trait SqlFunction[A] {
   //    case _ => function('all)
   //  }
 
-  protected def createFn(sql: Sql, attributes: Seq[Any], n: Seq[Partial]): Comparable =
-    new Function {
-      lazy val partial = new PartialStatement(attributes)(sql)
-    }
+  protected def createFn(sql: Sql, attributes: Seq[Any], n: Seq[Partial]): Comparable = ???
+  //  new Function {
+  //    lazy val partial = new PartialStatement(attributes)(sql)
+  //  }
 }
 
 abstract class SqlAggregateFunction[A] extends SqlFunction[A] {
   val index: Int
 
-  override protected def createFn(sql: Sql, attrs: Seq[Any], norm: Seq[Partial]): Function with Aggregation =
-    new Function with Aggregation {
-      lazy val partial = new PartialStatement(attrs)(sql)
-      val aggregated = norm(index).asInstanceOf[AttributeLike]
-    }
+  override protected def createFn(sql: Sql, attrs: Seq[Any], norm: Seq[Partial]): Function with Aggregation = ???
+    //new Function with Aggregation {
+    //  lazy val partial = new PartialStatement(attrs)(sql)
+    //  val aggregated = norm(index).asInstanceOf[AttributeLike]
+    //}
 }

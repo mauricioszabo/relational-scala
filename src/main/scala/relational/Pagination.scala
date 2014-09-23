@@ -1,14 +1,12 @@
 package relational
 
-class Pagination(sql: Adapter => String, attributes: Seq[Any],
+class Pagination(partialStatement: PartialStatement,
     offset: Int = -1, limit: Int = -1) extends Partial {
 
-  lazy val partial = {
-    var limitSQL = this.sql
-    if(limit >= 0) limitSQL = { a: Adapter => sql(a) + " LIMIT " + limit }
-    var offsetSQL = limitSQL
-    if(offset >= 0) offsetSQL = { a: Adapter => limitSQL(a) + " OFFSET " + offset }
-
-    new PartialStatement(attributes)(offsetSQL)
+  lazy val partial = partialStatement.map { p =>
+    var query = p.query
+    if(limit >= 0) query += " LIMIT " + limit
+    if(offset >= 0) query += " OFFSET " + offset
+    query -> p.params
   }
 }

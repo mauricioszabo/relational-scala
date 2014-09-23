@@ -9,10 +9,8 @@ case class Equality(
   protected val attribute: AttributeLike,
   protected val other: AttributeLike) extends Comparission {
 
-  lazy val partial = new PartialStatement(ap.attributes ++ other.partial.attributes)(a =>
-    aSql(a) + other.partial.sql(a)
-  )
-
-  private def aSql(a: Adapter) = ap.sql(a) + " " + comparission + " "
-  private lazy val ap = attribute.partial
+  lazy val partial = for {
+    a <- attribute.partial
+    o <- other.partial
+  } yield a.query + " " + comparission + " " + o.query -> (a.params ++ o.params)
 }

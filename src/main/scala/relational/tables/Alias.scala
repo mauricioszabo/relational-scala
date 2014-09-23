@@ -9,15 +9,10 @@ case class Alias(private val name: String,
 
   def as(name: String) = new Alias(name, table)
   def representation(a: Adapter) = Escape(a, name)
-  def partial = {
-    val ps = new PartialStatement(tPartial.attributes)(_: Adapter => String)
-    table match {
-      case _: TableLike => ps { a => tPartial.sql(a) + " " + Escape(a, name) }
-      case _: FullSelect => ps { a => "(" + tPartial.sql(a) + ") " + Escape(a, name) }
-    }
+  def partial = for( p <- table.partial ) yield table match {
+    case _: TableLike => (p.query + " " + Escape(p.adapter, name), p.params)
+    case _: FullSelect => ( "(" + p.query + ") " + Escape(p.adapter, name), p.params)
   }
 
   def apply(attribute: String) = new Attribute(this, attribute)
-
-  private lazy val tPartial = table.partial
 }

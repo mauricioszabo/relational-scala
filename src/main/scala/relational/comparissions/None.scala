@@ -3,7 +3,7 @@ package relational.comparissions
 import relational.PartialStatement
 
 object None extends Comparission {
-  lazy val partial = new PartialStatement("", Nil)
+  lazy val partial = PartialStatement { a => "" -> Nil }
 
   override protected def newEquality(k: String, a: Any): Comparission = None
   override def in(s: Seq[Any]) = None

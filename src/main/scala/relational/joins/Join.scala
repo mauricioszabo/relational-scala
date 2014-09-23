@@ -6,15 +6,10 @@ trait Join extends Partial {
   def table: tables.TableLike
   def condition: comparissions.Comparission
 
-  protected def newPartial(table: tables.TableLike, comparission: comparissions.Comparission, text: String) = {
-    val tablePartial = table.partial
-    val condPartial = comparission.partial
-    val fn = {a: Adapter =>
-      text + " " + tablePartial.sql(a) + " ON " + condPartial.sql(a)
-    }
-
-    new PartialStatement(tablePartial.attributes ++ condPartial.attributes)(fn)
-  }
+  protected def newPartial(table: tables.TableLike, comparission: comparissions.Comparission, text: String) = for {
+    t <- table.partial
+    c <- comparission.partial
+  } yield (text + " " + t.query + " ON " + c.query, t.params ++ c.params)
 }
 
 object Join {

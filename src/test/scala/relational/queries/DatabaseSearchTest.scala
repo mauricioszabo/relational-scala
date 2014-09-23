@@ -31,8 +31,9 @@ class DatabaseSearchTest extends WordSpec with tests.DatabaseSetup with matchers
   }
 
   def createStatement(partial: PartialStatement) = {
-    val statement = globalConnection.prepareStatement(partial.sql(Adapter))
-    setParams(statement, partial.attributes)
+    val (query, attributes) = partial.tuple(Adapter)
+    val statement = globalConnection.prepareStatement(query)
+    setParams(statement, attributes)
     statement.executeQuery
   }
 

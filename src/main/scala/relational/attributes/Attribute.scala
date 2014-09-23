@@ -3,8 +3,9 @@ package relational.attributes
 import relational._
 
 case class Attribute(val table: tables.TableLike, val name: String) extends Comparable {
-  lazy val partial = new PartialStatement(Nil)(a =>
-    table.representation(a) + "." + Escape(a, name))
+  lazy val partial = PartialStatement { a =>
+    table.representation(a) + "." + Escape(a, name) -> Nil
+  }
 }
 
 object Attribute {

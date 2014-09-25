@@ -32,7 +32,7 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
       results(two) should be === List((2, "Foo"))
     }
 
-    "finds distinct records" in {
+    "find distinct records" in {
       val people = new tables.Table("scala_people").as("sp")
       val two = People distinct ('id, 'name) from ('scala_people, people)
       results(two).size should be === 3
@@ -85,7 +85,7 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
       }
 
       r.partial.toPseudoSQL should be === ("SELECT \"scala_people\".* FROM \"scala_people\" ORDER BY " +
-        "(SELECT \"scala_addresses\".\"address\" FROM \"scala_addresses\" WHERE \"scala_addresses\".\"id\" = \"scala_people\".\"id\")")
+        "(SELECT \"scala_addresses\".\"address\" FROM \"scala_addresses\" WHERE \"scala_addresses\".\"id\" = \"scala_people\".\"id\") ASC")
     }
   }
 
@@ -117,7 +117,7 @@ class QueryTest extends WordSpec with ShouldMatchers with DatabaseSetup {
       result.partial.toPseudoSQL should be === (
         "SELECT \"sql\".\"id\" FROM (SELECT * FROM \"scala_people\" ORDER BY (\"scala_people\".\"id\") DESC) \"sql\" " +
         "INNER JOIN \"scala_addresses\" ON \"sql\".\"id\" = \"scala_addresses\".\"person_id\" " +
-        "ORDER BY \"sql\".\"name\""
+        "ORDER BY (\"sql\".\"name\") ASC"
       )
     }
   }

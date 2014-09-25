@@ -10,24 +10,16 @@ class FunctionsTest extends WordSpec with test.relational.Helpers {
 
   "Function" should {
     "create a function in SQL" in {
-      pending
-      //object Foobar extends SqlFunction {
-      //  //defineByFunction('all -> { case Seq(p, param) =>
-      //  //  (
-      //  //    { a: Adapter => "FOO_BAR(" + p.partial.sql(a) + ", "+ param.partial.sql(a) + ")" },
-      //  //    p.partial.attributes.toVector ++ param.partial.attributes
-      //  //  )
-      //  //})
-      //  defineByFunction(adapter => {
-      //    case 'all => {
-      //      case Seq(p, param) => (
-      //        "FOO_BAR(" + p.partial.sql(a) + ", "+ param.partial.sql(a) + ")",
-      //        p.partial.attributes.toVector ++ param.partial.attributes
-      //      )
-      //    }
-      //  })
-      //}
-      //Foobar(name, 10).partial.toPseudoSQL should be === """FOO_BAR("examples"."name", 10)"""
+      object Foobar extends SqlFunction[String] {
+        defineByFunction { case Seq(attribute, param) => {
+          case('all) => for {
+            a <- attribute.partial
+            p <- param.partial
+          } yield "FOO_BAR(" + a.query + ", " + p.query + ")" -> (a.params ++ p.params)
+        }}
+      }
+
+      Foobar(name, 10).partial.toPseudoSQL should be === """FOO_BAR("examples"."name", 10)"""
     }
 
     "create a function in a simpler way" in {
@@ -39,6 +31,7 @@ class FunctionsTest extends WordSpec with test.relational.Helpers {
     }
 
     "create a method that has different behaviour for each adapter" in {
+      pending
       object Foobar extends SqlFunction[Int] {
         define('all -> "$0 FOO($1)", 'oracle -> "$0 BAR($1)")
       }

@@ -6,14 +6,26 @@ import relational.attributes._
 trait Function extends Comparable
 
 trait SqlFunction[A] {
-  type PartialTuple = String => Seq[Any]
-
   type Sql = Adapter => String
-  type SeqToPartial = Seq[Partial] => (Sql, Seq[Any])
-  type DriverAndFunction = (Symbol, SeqToPartial)
+  var function = {s: Seq[Any] => PartialStatement { a => "" -> Nil }}
 
   def define(s: (Symbol, String)*) = ???
-  def apply(s: Any*): Comparable = ???
+
+  def defineByFunction(fns: Seq[Partial] => PartialFunction[Symbol, PartialStatement]) {
+    def fn(params: Seq[Any]) = {
+      val normalized = params map Attribute.wrap
+      val pf: PartialFunction[Symbol, PartialStatement] = fns(normalized)
+      PartialStatement { adapter =>
+        val partial = pf.lift(adapter.currentDriver).getOrElse(pf('all))
+        partial.tuple(adapter)
+      }
+    }
+    function = fn
+  }
+
+  def apply(params: Any*): Comparable = new Function {
+    lazy val partial = function(params)
+  }
 
   //var function: Adapter => PartialFunction[Symbol, PartialTuple] = _
 
@@ -57,8 +69,6 @@ trait SqlFunction[A] {
   //    case Some(function) => function
   //    case _ => function('all)
   //  }
-
-  protected def createFn(sql: Sql, attributes: Seq[Any], n: Seq[Partial]): Comparable = ???
   //  new Function {
   //    lazy val partial = new PartialStatement(attributes)(sql)
   //  }
@@ -67,9 +77,8 @@ trait SqlFunction[A] {
 abstract class SqlAggregateFunction[A] extends SqlFunction[A] {
   val index: Int
 
-  override protected def createFn(sql: Sql, attrs: Seq[Any], norm: Seq[Partial]): Function with Aggregation = ???
-    //new Function with Aggregation {
-    //  lazy val partial = new PartialStatement(attrs)(sql)
-    //  val aggregated = norm(index).asInstanceOf[AttributeLike]
-    //}
+  override def apply(params: Any*): Comparable = new Function with Aggregation {
+    lazy val partial = function(params)
+    lazy val aggregated = Attribute.wrap(params(index)).asInstanceOf[AttributeLike]
+  }
 }

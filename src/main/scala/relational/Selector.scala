@@ -10,7 +10,7 @@ case class Selector(
     group: Seq[attributes.AttributeLike] = Nil,
     having: comparissions.Comparission = comparissions.None,
     join: Seq[joins.Join] = Nil,
-    order: Seq[Partial] = Nil,
+    order: Seq[orders.Ordering] = Nil,
     connection: java.sql.Connection = null,
     limit: Int = -1,
     offset: Int = -1
@@ -28,26 +28,30 @@ case class Selector(
     )
   }
 
-  lazy val partial = for {
-    s <- select.partial
-    f <- partialTo(from, "FROM ")
-    w <- partialTo(where, "WHERE ")
-    g <- partialTo(group, "GROUP BY ")
-    h <- partialTo(having, "HAVING ")
-    j <- partialTo(join)
-    o <- partialTo(order, "ORDER BY ")
-  } yield (
-    s.query + f.query + w.query + g.query + h.query + j.query + o.query,
-    s.params ++ f.params ++ w.params ++ g.params ++ h.params ++ j.params ++ o.params
-  )
+  lazy val partial = {
+    val queries = for {
+      s <- select.partial
+      f <- partialTo(from, " FROM ")
+      w <- partialTo(where,  " WHERE ")
+      g <- partialTo(group, " GROUP BY ")
+      h <- partialTo(having, " HAVING ")
+      j <- partialTo(join, " ")
+      o <- partialTo(order, " ORDER BY ")
+    } yield (
+      s.query + f.query + w.query + g.query + h.query + j.query + o.query,
+      s.params ++ f.params ++ w.params ++ g.params ++ h.params ++ j.params ++ o.params
+    )
 
-  private def partialTo(partials: Seq[Partial], string: String = ""): PartialStatement = {
+    new Pagination(queries, limit=limit, offset=offset).partial
+  }
+
+  private def partialTo(partials: Seq[Partial], string: String): PartialStatement = {
     partials.toList match {
       case Nil => nilPartial
-      case head::Nil => head.partial
+      case head::Nil => head.partial.map { p => string + p.query -> p.params }
       case head::tail => for {
         p1 <- head.partial
-        p2 <- partialTo(tail)
+        p2 <- partialTo(tail, ", ")
       } yield (string + p1.query + p2.query, p1.params ++ p2.params)
     }
   }

@@ -14,14 +14,14 @@ class Select(distinct: Boolean, table: tables.TableLike, listOfAttributes: Any*)
 
   lazy val partial = PartialStatement { adapter =>
     var query = ""
-    val params = attributeList.map { attribute =>
+    val params = attributeList.flatMap { attribute =>
       val (str, seq) = attribute.partial.tuple(adapter)
-      query += str + ","
+      query += str + ", "
       seq
     }
 
     val clause = if(distinct) "SELECT DISTINCT " else "SELECT "
-    query.substring(0, query.length - 1) -> params
+    clause + query.substring(0, query.length - 2) -> params
   }
 
   private def convert(list: List[Any]): List[attributes.AttributeLike] = list match {

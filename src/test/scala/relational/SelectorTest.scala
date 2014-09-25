@@ -15,7 +15,6 @@ class SelectorTest extends WordSpec with DatabaseSetup with ShouldMatchers {
 
     "create a SQL" in {
       selector.partial.toPseudoSQL should be === "SELECT \"scala_people\".* FROM \"scala_people\""
-
       val selector2 = selector.copy(where=(people("id") == 10))
       selector2.partial.toPseudoSQL should be === "SELECT \"scala_people\".* FROM \"scala_people\" WHERE \"scala_people\".\"id\" = 10"
     }

@@ -88,9 +88,16 @@ trait QueryBase[A] {
   def rightJoin(table: tables.TableLike) = new joins.JoinHelper(this, table, 'right)
   def rightJoin(table: Symbol): joins.JoinHelper[A] = rightJoin(new tables.Table(table.name))
 
-  def order(orders: Partial*) = withSelector { s => s.copy(order=orders) }
-  def order(orders: tables.TableLike => Seq[Partial]) = withSelector { s =>
-    s.copy(order=orders(table))
+  def order(partials: Partial*) = withSelector { s => s.copy(order=partials.map {
+    case o: orders.Ordering => o
+    case o: Partial => orders.Ascending(o)
+  })}
+
+  def order(partials: tables.TableLike => Seq[Partial]) = withSelector { s =>
+    s.copy(order=partials(table).map {
+      case o: orders.Ordering => o
+      case o: Partial => orders.Ascending(o)
+    })
   }
 
   protected def withSelector(fn: Selector => Selector): A

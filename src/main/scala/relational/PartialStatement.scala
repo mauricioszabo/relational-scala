@@ -23,7 +23,7 @@ case class PartialStatement(tuple: Adapter => (String, Seq[Any])) {
 
   //FIXME: remove this code, it doesn't belongs here.
   def createStatement(connection: Connection) = {
-    val (query, params) = tuple(null)
+    val (query, params) = tuple(Adapter)
     val statement = connection.prepareStatement(query)
     setParams(statement, params)
     statement
@@ -37,14 +37,14 @@ case class PartialStatement(tuple: Adapter => (String, Seq[Any])) {
   }
 
   //Monadic operations.
-  protected[relational] def map(fn: PartialStatementParams => (String, Seq[Any])): PartialStatement = {
+  def map(fn: PartialStatementParams => (String, Seq[Any])): PartialStatement = {
     PartialStatement { adapter =>
       val (query, params) = tuple(adapter)
       fn(PartialStatementParams(query, params, adapter))
     }
   }
 
-  protected[relational] def flatMap(fn: PartialStatementParams => PartialStatement): PartialStatement = {
+  def flatMap(fn: PartialStatementParams => PartialStatement): PartialStatement = {
     PartialStatement { adapter =>
       val (query, params) = tuple(adapter)
       fn(PartialStatementParams(query, params, adapter)).tuple(adapter)

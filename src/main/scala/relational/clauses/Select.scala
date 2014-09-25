@@ -15,7 +15,7 @@ class Select(distinct: Boolean, table: tables.TableLike, listOfAttributes: Any*)
   lazy val partial = PartialStatement { adapter =>
     var query = ""
     val params = attributeList.flatMap { attribute =>
-      val (str, seq) = attribute.partial.tuple(adapter)
+      val (str, seq) = attribute.selectPartial.tuple(adapter)
       query += str + ", "
       seq
     }

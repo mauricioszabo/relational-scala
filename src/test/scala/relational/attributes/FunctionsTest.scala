@@ -23,21 +23,23 @@ class FunctionsTest extends WordSpec with test.relational.Helpers {
     }
 
     "create a function in a simpler way" in {
-      object Foobar extends SqlFunction[Int] { define('all -> "FOOBAR($0, $1)") }
-      object Foobar2 extends SqlFunction[Int] { define('all -> "$0 FOOBAR($2, $1)") }
+      object Foobar extends SqlFunction[Int] { define { case _ => "FOOBAR($0, $1)" } }
+      object Foobar2 extends SqlFunction[Int] { define { case _ => "$0 FOOBAR($2, $1)"} }
 
       Foobar(name, 10).partial.toPseudoSQL should be === "FOOBAR(\"examples\".\"name\", 10)"
       Foobar2(name, 10, 20).partial.toPseudoSQL should be === "\"examples\".\"name\" FOOBAR(20, 10)"
     }
 
     "create a method that has different behaviour for each adapter" in {
-      pending
       object Foobar extends SqlFunction[Int] {
-        define('all -> "$0 FOO($1)", 'oracle -> "$0 BAR($1)")
+        define {
+          case 'all => "$0 FOO($1)"
+          case 'oracle => "$0 BAR($1)"
+        }
       }
 
       adapter configure 'mysql
-      Foobar(name, 10).partial.toPseudoSQL should be === """"examples"."name" FOO(10)"""
+      Foobar(name, 10).partial.toPseudoSQL should be === """`examples`.`name` FOO(10)"""
 
       adapter configure 'oracle
       Foobar(name, 10).partial.toPseudoSQL should be === """"examples"."name" BAR(10)"""

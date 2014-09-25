@@ -31,7 +31,7 @@ class ForComprehensionTest extends WordSpec with matchers.ShouldMatchers with Be
         if(child.name == "Foo")
       } yield Map('age -> child.get('age), 'name -> user.get('name))
 
-      sqlFor(result) should be === "SELECT `children`.`age`, `people`.`name` FROM `people`,`children` " +
+      sqlFor(result) should be === "SELECT `children`.`age`, `people`.`name` FROM `people`, `children` " +
         "WHERE `children`.`name` = 'Foo'"
     }
 
@@ -42,7 +42,7 @@ class ForComprehensionTest extends WordSpec with matchers.ShouldMatchers with Be
         if(user.name == "Foo")
       } yield Map('age -> child.get('age), 'name -> user.get('name))
 
-      sqlFor(result) should be === "SELECT `children`.`age`, `people`.`name` FROM `people`,`children` " +
+      sqlFor(result) should be === "SELECT `children`.`age`, `people`.`name` FROM `people`, `children` " +
         "WHERE `people`.`name` = 'Foo'"
     }
 
@@ -54,7 +54,7 @@ class ForComprehensionTest extends WordSpec with matchers.ShouldMatchers with Be
         if(child.name == "Bar")
       } yield Map('age -> child.any('age))
 
-      sqlFor(result) should be === "SELECT `children`.`age` FROM `people`,`children` " +
+      sqlFor(result) should be === "SELECT `children`.`age` FROM `people`, `children` " +
         "WHERE (`people`.`name` = 'Foo' AND `children`.`name` = 'Bar')"
     }
   }
@@ -128,7 +128,7 @@ class ForComprehensionTest extends WordSpec with matchers.ShouldMatchers with Be
         analyzed <- criticalComponents
         if ccc.critical_component_id == analyzed.critical_components.id
       } yield (ccc any 'criticidade_id, analyzed.critical_components.get(CountDistinct, 'id))
-      println(sqlFor(countedAnalysed))
+      //println(sqlFor(countedAnalysed))
     }
   }
 
@@ -141,7 +141,7 @@ class ForComprehensionTest extends WordSpec with matchers.ShouldMatchers with Be
         if q.as.name == "boo" && q.bs.id == 20
       } yield q.any('address)
 
-      sqlFor(result) should be === "SELECT `bs`.`address` FROM `as`,`bs` WHERE (`as`.`id` = 10 AND " +
+      sqlFor(result) should be === "SELECT `bs`.`address` FROM `as`, `bs` WHERE (`as`.`id` = 10 AND " +
         "`as`.`name` = 'boo' AND `bs`.`id` = 20)"
     }
 
@@ -152,7 +152,7 @@ class ForComprehensionTest extends WordSpec with matchers.ShouldMatchers with Be
         if q.as.name == "boo" && q.bs.id == 20 && t.name == "bar"
       } yield q.any('address)
 
-      sqlFor(result) should be === "SELECT `bs`.`address` FROM `as`,`bs`,`people` WHERE (`as`.`id` = 10 AND " +
+      sqlFor(result) should be === "SELECT `bs`.`address` FROM `as`, `bs`, `people` WHERE (`as`.`id` = 10 AND " +
         "`as`.`name` = 'boo' AND `bs`.`id` = 20 AND `people`.`name` = 'bar')"
     }
 
@@ -174,13 +174,14 @@ class ForComprehensionTest extends WordSpec with matchers.ShouldMatchers with Be
         if q.as.name == "boo"
       } yield q.as.any('age)
 
-      sqlFor(result) should be === "SELECT `as`.`age` FROM `as`,`bs` WHERE (`as`.`id` = 10 AND " +
+      sqlFor(result) should be === "SELECT `as`.`age` FROM `as`, `bs` WHERE (`as`.`id` = 10 AND " +
         "`as`.`name` = 'boo')"
     }
 
     "query for grouping functions" in {
       val result = for(q <- query) yield (q.as any 'age, q.get(Count, q.as.age))
-      sqlFor(result) should be === "SELECT `as`.`age`, COUNT(`as`.`age`) count_as_age_ FROM `as`,`bs` " +
+
+      sqlFor(result) should be === "SELECT `as`.`age`, COUNT(`as`.`age`) `count_as_age_` FROM `as`, `bs` " +
         "WHERE `as`.`id` = 10 GROUP BY `as`.`age`"
     }
   }

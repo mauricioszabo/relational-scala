@@ -35,23 +35,23 @@ case class Selector(
       w <- partialTo(where,  " WHERE ")
       g <- partialTo(group, " GROUP BY ")
       h <- partialTo(having, " HAVING ")
-      j <- partialTo(join, " ")
+      j <- partialTo(join, " ", " ")
       o <- partialTo(order, " ORDER BY ")
     } yield (
-      s.query + f.query + w.query + g.query + h.query + j.query + o.query,
-      s.params ++ f.params ++ w.params ++ g.params ++ h.params ++ j.params ++ o.params
+      s.query + f.query + j.query + w.query + g.query + h.query + o.query,
+      s.params ++ f.params ++ j.params ++ w.params ++ g.params ++ h.params ++ o.params
     )
 
     new Pagination(queries, limit=limit, offset=offset).partial
   }
 
-  private def partialTo(partials: Seq[Partial], string: String): PartialStatement = {
+  private def partialTo(partials: Seq[Partial], string: String, separator: String = ", "): PartialStatement = {
     partials.toList match {
       case Nil => nilPartial
       case head::Nil => head.partial.map { p => string + p.query -> p.params }
       case head::tail => for {
         p1 <- head.partial
-        p2 <- partialTo(tail, ", ")
+        p2 <- partialTo(tail, separator, separator)
       } yield (string + p1.query + p2.query, p1.params ++ p2.params)
     }
   }

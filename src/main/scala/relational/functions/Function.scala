@@ -9,7 +9,18 @@ trait SqlFunction[A] {
   type Sql = Adapter => String
   var function = {s: Seq[Any] => PartialStatement { a => "" -> Nil }}
 
-  def define(s: (Symbol, String)*) = ???
+  def define(strings: PartialFunction[Symbol, String]) {
+    def fn(params: Seq[Any]) = PartialStatement { adapter =>
+      val fnString = strings.lift(adapter.currentDriver).getOrElse(strings('all))
+      val matchList = """\$(\d+)""".r.findAllMatchIn(fnString)
+      matchList.foldLeft(fnString -> Seq[Any]()) { case((query, attrs), matchElement) =>
+        val index = matchElement.group(1).toInt
+        val (paramQuery, paramParams) = Attribute.wrap(params(index)).partial.tuple(adapter)
+        query.replaceAll("\\$" + index, paramQuery) -> (attrs ++ paramParams)
+      }
+    }
+    function = fn
+  }
 
   def defineByFunction(fns: Seq[Partial] => PartialFunction[Symbol, PartialStatement]) {
     def fn(params: Seq[Any]) = {
@@ -26,8 +37,6 @@ trait SqlFunction[A] {
   def apply(params: Any*): Comparable = new Function {
     lazy val partial = function(params)
   }
-
-  //var function: Adapter => PartialFunction[Symbol, PartialTuple] = _
 
   ////def define(stringFunctions: (Symbol, String)*) = {
   ////  val fnForEachDriver = stringFunctions.map { case(driver, string) =>
@@ -49,29 +58,6 @@ trait SqlFunction[A] {
   ////  }
   ////  defineByFunction(fnForEachDriver: _*)
   ////}
-
-  ////def defineByFunction(functions: DriverAndFunction*) = function = functions.toMap
-
-  //def defineByFunction(functions: Adapter => PartialFunction[Symbol, PartialTuple]) = {
-  //  function = functions
-  //}
-
-  //def apply(params: Any*): Comparable = {
-  //  val normalized = params.map { p => Attribute.wrap(p) }
-  //  val (query, attributes) = getFunction(normalized)
-  //  createFn(query, attributes, normalized)
-  //}
-
-  //private def getFunction: Seq[Partial] => (Sql, Seq[Any]) = {
-  //  val fn = function(
-  //  function.applyOrElse(
-  //  function.get(adapter.currentDriver) match {
-  //    case Some(function) => function
-  //    case _ => function('all)
-  //  }
-  //  new Function {
-  //    lazy val partial = new PartialStatement(attributes)(sql)
-  //  }
 }
 
 abstract class SqlAggregateFunction[A] extends SqlFunction[A] {

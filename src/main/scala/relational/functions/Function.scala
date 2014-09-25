@@ -37,27 +37,6 @@ trait SqlFunction[A] {
   def apply(params: Any*): Comparable = new Function {
     lazy val partial = function(params)
   }
-
-  ////def define(stringFunctions: (Symbol, String)*) = {
-  ////  val fnForEachDriver = stringFunctions.map { case(driver, string) =>
-  ////    val fn = { (params: Seq[Partial]) =>
-  ////      val attributes = params.flatMap(_.partial.attributes)
-
-  ////      val sqlString = { adapter: Adapter =>
-  ////        val matchList = """\$(\d+)""".r.findAllMatchIn(string)
-
-  ////        matchList.foldLeft(string) { (query, matchElement) =>
-  ////          val index = matchElement.group(1).toInt
-  ////          val partial = params(index).partial
-  ////          query.replaceAll("\\$" + index, partial.sql(adapter))
-  ////        }
-  ////      }
-  ////      (sqlString, attributes)
-  ////    }
-  ////    (driver, fn)
-  ////  }
-  ////  defineByFunction(fnForEachDriver: _*)
-  ////}
 }
 
 abstract class SqlAggregateFunction[A] extends SqlFunction[A] {

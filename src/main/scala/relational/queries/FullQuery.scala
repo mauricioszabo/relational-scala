@@ -9,6 +9,8 @@ import java.sql.ResultSet
 class FullQuery[A, U](selector: Selector, resultStructure: AttributesEntry[A] => U)
                      extends Query[A, U](selector, resultStructure) {
 
+  def as(name: String) = new Table(selector.as(name))
+
   def withFilter(fn: FakeAttributesFromQuery => comparissions.Comparission) = {
     val entries = new FakeAttributesFromQuery(this)
     val newSel = selector.copy(where=selector.where && fn(entries))

@@ -8,20 +8,23 @@ import relational.functions.Aggregation
 import relational.attributes.{Attribute => RAttr, AttributeLike, Alias}
 import relational.tables.TableLike
 import relational.joins._
-import relational.{Selector, QueryAnalyzer}
+import relational.Selector
+import relational.analyzers.QueryAnalyzer
 
 class AttributeNormalizer[U](oldSelector: Selector, attributes: Seq[AttributeLike],
                               newTables: Vector[TableLike], newConditions: Comparission) {
 
+  var having = oldSelector.having
   val selectAttrs = oldSelector.select ++ attributes
   var from = (newTables ++ oldSelector.from).toList
   var joins = oldSelector.join.toList
-  val where = normalizeComparissions(newConditions && oldSelector.where)
   val groups = oldSelector.group.toBuffer ++ extractGroupBy(selectAttrs)
+  val where = normalizeComparissions(newConditions && oldSelector.where)
 
   private def normalizeComparissions(c: Comparission): Comparission = c match {
-    case Equality(_, a1: RAttr, a2: RAttr) =>
-      extractJoins(a1.table, a2.table, c.asInstanceOf[Equality])
+    case Equality(_, fun: Aggregation, _) => extractHaving(c)
+    case Equality(_, _, fun: Aggregation) => extractHaving(c)
+    case Equality(_, a1: RAttr, a2: RAttr) => extractJoins(a1.table, a2.table, c.asInstanceOf[Equality])
     case And(comparissions) =>
       comparissions.foldLeft(None: Comparission) { (previous, comp) =>
         previous && normalizeComparissions(comp)
@@ -41,6 +44,11 @@ class AttributeNormalizer[U](oldSelector: Selector, attributes: Seq[AttributeLik
     } else {
       comparission
     }
+  }
+
+  private def extractHaving(c: Comparission) = {
+    having = having && c
+    None
   }
 
   private def extractGroupBy(attributes: Seq[AttributeLike]) = {
@@ -71,6 +79,7 @@ class AttributeNormalizer[U](oldSelector: Selector, attributes: Seq[AttributeLik
     from=from,
     join=joins,
     where=where,
-    group=groups
+    group=groups,
+    having=having
   )
 }

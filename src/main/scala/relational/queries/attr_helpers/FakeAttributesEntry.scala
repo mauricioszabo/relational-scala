@@ -18,10 +18,11 @@ class FakeAttributesEntry(table: TableLike) extends AttributesEntry[Comparable] 
     default[A]
   }
 
+  private val sanitized = """[^\d\w]+""".r
+
   def get[A](function: relational.functions.SqlFunction[A],params: relational.Partial*): A = {
     val fn = function(params: _*)
-    val regexp = """[^\d\w]+""".r
-    val aliasName = regexp.replaceAllIn(fn.partial.toPseudoSQL, "_").toLowerCase
+    val aliasName = sanitized.replaceAllIn(fn.partial.toPseudoSQL, "_").toLowerCase
     addAttributeToList(FakeAttribute(fn.as(aliasName)))
     default[A]
   }
@@ -29,8 +30,7 @@ class FakeAttributesEntry(table: TableLike) extends AttributesEntry[Comparable] 
   def get[A](function: relational.functions.SqlFunction[A], attributeName: Symbol): A = {
     val attr = table(attributeName)
     val fn = function(attr)
-    val regexp = """[^\d\w]+""".r
-    val aliasName = regexp.replaceAllIn(fn.partial.toPseudoSQL, "_").toLowerCase
+    val aliasName = sanitized.replaceAllIn(fn.partial.toPseudoSQL, "_").toLowerCase
     addAttributeToList(FakeAttribute(AttrAlias(aliasName, fn)))
     default[A]
   }

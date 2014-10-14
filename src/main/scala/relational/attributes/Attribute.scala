@@ -9,8 +9,8 @@ case class Attribute(val table: tables.TableLike, val name: String) extends Comp
 }
 
 object Attribute {
-  def wrap(any: Any): Comparable = any match {
-    case a: Attribute => a
+  def wrap(any: Any): AttributeLike = any match {
+    case a: AttributeLike => a
     case _ => new attributes.Literal(any)
   }
 }

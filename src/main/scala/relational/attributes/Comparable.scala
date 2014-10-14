@@ -25,6 +25,8 @@ trait Comparable extends AttributeLike {
   }
 
   def in(list: Seq[Any]): Comparission = new In(this, list)
+  def notIn(list: Seq[Any]): Comparission = new NotIn(this, list)
 
   def isNull: Comparission = new IsNull(this)
+  def notNull: Comparission = new NotNull(this)
 }

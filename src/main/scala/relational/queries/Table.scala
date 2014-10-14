@@ -7,7 +7,7 @@ import relational.attributes.{AttributeLike, Comparable}
 import relational.comparissions.{Comparission, None}
 import relational.clauses.Select
 
-class Table protected(val table: tables.TableLike, val filter: Comparission = None)
+class Table protected[queries](val table: tables.TableLike, val filter: Comparission = None)
                       extends Partial {
   lazy val partial = table.partial
 

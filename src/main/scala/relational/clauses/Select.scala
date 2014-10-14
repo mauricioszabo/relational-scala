@@ -21,7 +21,10 @@ class Select(distinct: Boolean, table: tables.TableLike, listOfAttributes: Any*)
     }
 
     val clause = if(distinct) "SELECT DISTINCT " else "SELECT "
-    clause + query.substring(0, query.length - 2) -> params
+    if(query == "")
+      clause -> params
+    else
+      clause + query.substring(0, query.length - 2) -> params
   }
 
   private def convert(list: List[Any]): List[attributes.AttributeLike] = list match {

@@ -1,5 +1,6 @@
-package relational
+package relational.analyzers
 
+import relational._
 import relational.attributes.AttributeLike
 import relational.comparissions.{Comparission, None => NullComp, And, Equality}
 import relational.joins.Join
@@ -25,7 +26,8 @@ class QueryAnalyzer(selector: Selector) {
   }
 
 
-  private def allConditions: Comparission = {
+  // This brings all conditions that restrict this query, like conditions in joins, in where, and having.
+  def allConditions: Comparission = {
     val seed = selector.where && selector.having
     selector.join.foldLeft(seed) {
       case(comp, Join(_, c, 'inner)) => comp && c

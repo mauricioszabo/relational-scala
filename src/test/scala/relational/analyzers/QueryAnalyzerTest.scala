@@ -1,10 +1,11 @@
-package test.relational
+package test.relational.analyzers
 
 import org.scalatest._
 import relational.tables.Table
 import relational.attributes.Attribute
 import relational.joins._
-import relational.{QueryAnalyzer, Selector}
+import relational.analyzers.QueryAnalyzer
+import relational.Selector
 import relational.clauses.Select
 
 class QueryAnalyzerTest extends WordSpec with matchers.ShouldMatchers {

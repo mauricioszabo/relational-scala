@@ -96,7 +96,7 @@ class ForComprehensionTest extends WordSpec with matchers.ShouldMatchers with Be
   }
 
   "Querying with aggregate functions" should {
-    "add the aggregated on group by" in {
+    "adds the non-grouped-clauses on group by" in {
       val result = for( p <- Table('people) ) yield p.get(Count, 'name)
       sqlFor(result) should be === "SELECT COUNT(`people`.`name`) `count_people_name_` FROM `people`"
 
@@ -117,18 +117,55 @@ class ForComprehensionTest extends WordSpec with matchers.ShouldMatchers with Be
         "GROUP BY `joined`.`person_id`"
     }
 
+    "add the aggregated conditions on HAVING" in {
+      val result = for {
+        p <- Table('people)
+        if Count(p.name) > 2
+      } yield p any 'name
+
+      sqlFor(result) should be === "SELECT `people`.`name` FROM `people` HAVING COUNT(`people`.`name`) > 2"
+    }
+
     "WOO!!!" should {
-      val criticalComponents = for( cc <- Table('critical_components) if cc.id < 4000) yield cc.id
+      //val criticalComponents = for( cc <- Table('critical_components) if cc.id < 4000) yield cc.any('id)
 
-      val countedCC = for(ccc <- Table('critical_comp_criticidades))
-                      yield ccc.get[Int]('criticidade_id) -> ccc.get(Count, ccc.criticidade_id)
+      //val analyzedJoin = for {
+      //  analyzed <- criticalComponents.as("analyzed")
+      //  criticalFromAnalyzed <- Table('critical_comp_criticidades)
+      //  if analyzed.id == criticalFromAnalyzed.criticidade_id
+      //} yield analyzed any 'id
 
-      val countedAnalysed = for {
-        ccc <- Table('critical_comp_criticidades)
-        analyzed <- criticalComponents
-        if ccc.critical_component_id == analyzed.critical_components.id
-      } yield (ccc any 'criticidade_id, analyzed.critical_components.get(CountDistinct, 'id))
-      //println(sqlFor(countedAnalysed))
+      //val criticalities = for {
+      //  //analyzed join
+
+      //  critical <- Table('critical_comp_criticidades).as("ccc2")
+      //  if analyzed.id == critical.criticidade_id
+      //  if CountDistinct(analyzed.id) == Count(critical.criticidade_id)
+      //} yield critical any 'criticidade_id
+
+      //println(criticalities.partial.tuple(relational.Adapter))
+
+      //println(sqlFor(criticalities))
+
+      //Class.forName("org.postgresql.Driver");
+      //val globalConnection = java.sql.DriverManager.getConnection("jdbc:postgresql:randon_development", "postgres", "")
+      //def createStatement(partial: relational.PartialStatement) = {
+      //  val (query, attributes) = partial.tuple(relational.Adapter)
+      //  val statement = globalConnection.prepareStatement(query)
+      //  setParams(statement, attributes)
+      //  statement.executeQuery
+      //}
+
+      //def setParams(statement: java.sql.PreparedStatement, attributes: Seq[Any]) =
+      //1 to attributes.size foreach { i =>
+      //  attributes(i-1) match {
+      //    case int: Int => statement.setObject(i, int)
+      //    case str: String => statement.setObject(i, str)
+      //  }
+      //}
+
+      //val res = criticalities.asStream(createStatement)
+      //println(res)
     }
   }
 
@@ -194,6 +231,14 @@ class ForComprehensionTest extends WordSpec with matchers.ShouldMatchers with Be
       } yield t any 'name
 
       sqlFor(result) should be === "SELECT `p`.`name` FROM `people` `p` WHERE `p`.`id` = 10"
+    }
+
+    "Alias a query" in {
+      val query = for( a <- Table('as) if a.id == 10 ) yield a.any('name)
+      val result = for( a <- query.as("q1") if a.name == "Foo") yield a any 'id
+
+      sqlFor(result) should be === "SELECT `q1`.`id` FROM (SELECT `as`.`name` FROM `as` " +
+        "WHERE `as`.`id` = 10) `q1` WHERE `q1`.`name` = 'Foo'"
     }
   }
 

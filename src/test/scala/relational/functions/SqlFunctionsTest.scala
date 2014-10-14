@@ -19,6 +19,20 @@ class SqlFunctionsTest extends WordSpec with test.relational.Helpers {
       pseudoSQL(Upper(name) == "UP") should be === """UPPER("examples"."name") = 'UP'"""
       pseudoSQL(Lower(name) == "up") should be === """LOWER("examples"."name") = 'up'"""
     }
+
+    "support returning a list of attributes they're being applied in a group by" in {
+     implicit val adapter = new relational.Adapter('postgresql)
+     pseudoSQL(GroupConcat(name, "-")) should be === """ARRAY_TO_STRING(ARRAY_AGG("examples"."name"), '-')"""
+
+     adapter configure 'sqlite3
+     pseudoSQL(GroupConcat(name, "-")) should be === """GROUP_CONCAT("examples"."name", '-')"""
+
+     adapter configure 'mysql
+     pseudoSQL(GroupConcat(name, "-")) should be === """GROUP_CONCAT(`examples`.`name` SEPARATOR '-')"""
+
+     adapter configure 'oracle
+     pseudoSQL(GroupConcat(name, "-")) should be === """LISTAGG("examples"."name", '-') WITHIN GROUP("examples"."name")"""
+    }
   }
 
   "Aggregation SQL functions" should {

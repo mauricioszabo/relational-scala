@@ -14,7 +14,7 @@ class QueryAnalyzer(selector: Selector) {
 
   private def extractConditions(comparission: Comparission, current: Set[Set[AttributeLike]]): Set[Set[AttributeLike]] =
   comparission match {
-    case Equality("=", one, two) =>
+    case Equality(Equality.Equals, one, two) =>
       val subtracted = current.filterNot { s => s.contains(one) || s.contains(two) }
       val combined = (current -- subtracted).flatten
       subtracted + combined

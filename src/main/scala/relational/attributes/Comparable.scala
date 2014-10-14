@@ -6,20 +6,20 @@ import relational.comparissions.None
 trait Comparable extends AttributeLike {
   def ===(other: => Any ) = this == other
   def ->(other: => Any ) = this == other
-  def ==(other: => Any ) = newEquality("=", other)
+  def ==(other: => Any ) = newEquality(Equality.Equals, other)
 
-  def !=(other: => Any ) = newEquality("<>", other)
-  def <=(other: Any) = newEquality("<=", other)
-  def <(other: Any) = newEquality("<", other)
-  def >=(other: Any) = newEquality(">=", other)
-  def >(other: Any) = newEquality(">", other)
+  def !=(other: => Any ) = newEquality(Equality.Diferent, other)
+  def <=(other: Any) = newEquality(Equality.LtE, other)
+  def <(other: Any) = newEquality(Equality.Lt, other)
+  def >=(other: Any) = newEquality(Equality.GtE, other)
+  def >(other: Any) = newEquality(Equality.Gt, other)
 
   def =~(other: Any) = like(other)
-  def like(other: Any) = newEquality("LIKE", other)
+  def like(other: Any) = newEquality(Equality.Like, other)
   def !~(other: Any) = notLike(other)
-  def notLike(other: Any) = newEquality("NOT LIKE", other)
+  def notLike(other: Any) = newEquality(Equality.NotLike, other)
 
-  protected def newEquality(kind: String, other: Any): Comparission = other match {
+  protected def newEquality(kind: Equality.Comparission, other: Any): Comparission = other match {
     case None => None
     case _ => new Equality(kind, this, Attribute.wrap(other))
   }

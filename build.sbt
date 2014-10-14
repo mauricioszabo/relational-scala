@@ -1,6 +1,6 @@
 scalaVersion := "2.10.2"
 
-scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature")
+scalacOptions ++= Seq("-unchecked", "-deprecation", "-feature", "-Xmax-classfile-name", "100")
 
 scalacOptions in (Compile,doc) ++= Seq("-diagrams", "-implicits")
 

@@ -77,6 +77,11 @@ class AttributeTest extends WordSpec with matchers.ShouldMatchers {
       pseudoSQL(result) should be === "\"examples\".\"name\" IN ('Foo','Bar')"
     }
 
+    "find NOT IN a list of parameters" in {
+      val result = (name notIn List("Foo", "Bar"))
+      pseudoSQL(result) should be === "\"examples\".\"name\" NOT IN ('Foo','Bar')"
+    }
+
     "add an OR or AND condition" in {
       val c1 = (name == "Foo")
       val c2 = (id == 10)
